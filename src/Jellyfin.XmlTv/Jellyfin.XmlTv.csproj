@@ -13,6 +13,10 @@
     <RepositoryUrl>https://github.com/jellyfin/Jellyfin.XmlTv</RepositoryUrl>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
   <!-- Code analyzers -->
   <ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.7" PrivateAssets="All" />

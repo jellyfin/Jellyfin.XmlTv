@@ -7,6 +7,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4165DD32-4AD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jellyfin.XmlTv", "src\Jellyfin.XmlTv\Jellyfin.XmlTv.csproj", "{313EED6E-F5E6-4EAF-A44F-A584F41A09B8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{D7C98EE8-AD82-4854-9678-3826748C8B09}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jellyfin.XmlTv.Tests", "tests\Jellyfin.XmlTv.Tests\Jellyfin.XmlTv.Tests.csproj", "{D34D869A-CC25-4CB5-B880-3E0F5F921EB0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,8 +36,21 @@ Global
 		{313EED6E-F5E6-4EAF-A44F-A584F41A09B8}.Release|x64.Build.0 = Release|Any CPU
 		{313EED6E-F5E6-4EAF-A44F-A584F41A09B8}.Release|x86.ActiveCfg = Release|Any CPU
 		{313EED6E-F5E6-4EAF-A44F-A584F41A09B8}.Release|x86.Build.0 = Release|Any CPU
+		{D34D869A-CC25-4CB5-B880-3E0F5F921EB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D34D869A-CC25-4CB5-B880-3E0F5F921EB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D34D869A-CC25-4CB5-B880-3E0F5F921EB0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D34D869A-CC25-4CB5-B880-3E0F5F921EB0}.Debug|x64.Build.0 = Debug|Any CPU
+		{D34D869A-CC25-4CB5-B880-3E0F5F921EB0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D34D869A-CC25-4CB5-B880-3E0F5F921EB0}.Debug|x86.Build.0 = Debug|Any CPU
+		{D34D869A-CC25-4CB5-B880-3E0F5F921EB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D34D869A-CC25-4CB5-B880-3E0F5F921EB0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D34D869A-CC25-4CB5-B880-3E0F5F921EB0}.Release|x64.ActiveCfg = Release|Any CPU
+		{D34D869A-CC25-4CB5-B880-3E0F5F921EB0}.Release|x64.Build.0 = Release|Any CPU
+		{D34D869A-CC25-4CB5-B880-3E0F5F921EB0}.Release|x86.ActiveCfg = Release|Any CPU
+		{D34D869A-CC25-4CB5-B880-3E0F5F921EB0}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{313EED6E-F5E6-4EAF-A44F-A584F41A09B8} = {4165DD32-4ADC-4D09-9BA0-B9AC3EC5996F}
+		{D34D869A-CC25-4CB5-B880-3E0F5F921EB0} = {D7C98EE8-AD82-4854-9678-3826748C8B09}
 	EndGlobalSection
 EndGlobal

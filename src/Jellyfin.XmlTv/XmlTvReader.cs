@@ -29,8 +29,7 @@ namespace Jellyfin.XmlTv
         {
             _fileName = fileName;
 
-            // Normalize null/string.empty
-            _language = string.IsNullOrWhiteSpace(language) ? null : language;
+            _language = language;
         }
 
         private static XmlReader CreateXmlTextReader(string path)
@@ -148,7 +147,7 @@ namespace Jellyfin.XmlTv
             string channelId,
             DateTimeOffset startDateUtc,
             DateTimeOffset endDateUtc,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             var list = new List<XmlTvProgram>();
 
@@ -261,10 +260,7 @@ namespace Jellyfin.XmlTv
                                 xmlProg.Skip();
                                 break;
                             case "premiere":
-                                result.Premiere = new XmlTvPremiere();
-                                // This was causing data after the premiere node to not be read. Reactivate this and debug if the premiere details are ever needed.
-                                // ProcessPremiereNode(xmlProg, result);
-                                xmlProg.Skip();
+                                ProcessPremiereNode(xmlProg, result);
                                 break;
                             default:
                                 // unknown, skip entire node
@@ -765,14 +761,7 @@ namespace Jellyfin.XmlTv
                 reader,
                 s =>
                 {
-                    if (result.Premiere == null)
-                    {
-                        result.Premiere = new XmlTvPremiere() { Details = s };
-                    }
-                    else
-                    {
-                        result.Premiere.Details = s;
-                    }
+                    (result.Premiere ??= new XmlTvPremiere()).Details = s;
                 },
                 _language);
         }
@@ -830,7 +819,11 @@ namespace Jellyfin.XmlTv
             setter(result);
         }
 
-        public void ProcessNode(XmlReader reader, Action<string> setter, string languageRequired = null, Action<string> allOccurrencesSetter = null)
+        public void ProcessNode(
+            XmlReader reader,
+            Action<string> setter,
+            string languageRequired = null,
+            Action<string> allOccurrencesSetter = null)
         {
             /* <title lang="es">Homes Under the Hammer - Spanish</title>
              * <title lang="es">Homes Under the Hammer - Spanish 2</title>
@@ -884,15 +877,12 @@ namespace Jellyfin.XmlTv
                 }
             }
 
-            if (languageRequired != null)
+            foreach (var result in results)
             {
-                foreach (var result in results)
+                if (string.Equals(languageRequired, result.Item2, StringComparison.OrdinalIgnoreCase))
                 {
-                    if (string.Equals(languageRequired, result.Item2, StringComparison.OrdinalIgnoreCase))
-                    {
-                        setter(result.Item1);
-                        return;
-                    }
+                    setter(result.Item1);
+                    return;
                 }
             }
 
