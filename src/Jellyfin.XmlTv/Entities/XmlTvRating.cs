@@ -3,24 +3,23 @@ using System.Text;
 namespace Jellyfin.XmlTv.Entities
 {
     /// <summary>
-    /// Describes the rating (certification) applied to a program
+    /// Describes the rating (certification) applied to a program.
     /// </summary>
-    /// <remarks>Example XML:
-    /// </remarks>
     public class XmlTvRating
     {
         /// <summary>
-        /// The literal name of the rating system
+        /// Gets or sets the literal name of the rating system.
         /// </summary>
-        /// <example>MPAA</example>
+        /// Example: MPAA
         public string System { get; set; }
 
         /// <summary>
-        /// Describes the rating using the system specificed
+        /// Gets or setsthe rating using the system specificed.
         /// </summary>
-        /// <example>TV-14</example>
+        // Example: TV-14
         public string Value { get; set; }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             var builder = new StringBuilder();
@@ -31,7 +30,7 @@ namespace Jellyfin.XmlTv.Entities
 
             if (!string.IsNullOrEmpty(System))
             {
-                builder.AppendFormat(" ({0})", System);
+                builder.Append(" (").Append(System).Append(')');
             }
 
             return builder.ToString();

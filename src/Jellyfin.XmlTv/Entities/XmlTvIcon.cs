@@ -1,3 +1,6 @@
+#pragma warning disable SA1600
+#pragma warning disable CS1591
+
 using System.Text;
 
 namespace Jellyfin.XmlTv.Entities
@@ -5,21 +8,24 @@ namespace Jellyfin.XmlTv.Entities
     public class XmlTvIcon
     {
         public string Source { get; set; }
+
         public int? Width { get; set; }
+
         public int? Height { get; set; }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             var builder = new StringBuilder();
-            builder.AppendFormat("Source: {0}", Source);
+            builder.Append("Source: ").Append(Source);
             if (Width.HasValue)
             {
-                builder.AppendFormat(", Width: {0}", Width);
+                builder.Append(", Width: ").Append(Width);
             }
 
             if (Height.HasValue)
             {
-                builder.AppendFormat(", Height: {0}", Height);
+                builder.Append(", Height: ").Append(Height);
             }
 
             return builder.ToString();

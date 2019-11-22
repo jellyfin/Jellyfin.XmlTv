@@ -1,3 +1,6 @@
+#pragma warning disable SA1600
+#pragma warning disable CS1591
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -12,10 +15,10 @@ namespace Jellyfin.XmlTv
     // Reads an XmlTv file
     public class XmlTvReader
     {
+        private const string DateWithOffsetRegex = @"^(?<dateDigits>[0-9]{4,14})(\s(?<dateOffset>[+-]*[0-9]{1,4}))?$";
+
         private readonly string _fileName;
         private readonly string _language;
-
-        private const string DateWithOffsetRegex = @"^(?<dateDigits>[0-9]{4,14})(\s(?<dateOffset>[+-]*[0-9]{1,4}))?$";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="XmlTvReader" /> class.
@@ -44,9 +47,9 @@ namespace Jellyfin.XmlTv
         }
 
         /// <summary>
-        /// Gets the list of channels present in the XML
+        /// Gets the list of channels present in the XML.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The list of channels present in the XML.</returns>
         public IEnumerable<XmlTvChannel> GetChannels()
         {
             var list = new List<XmlTvChannel>();
@@ -134,13 +137,13 @@ namespace Jellyfin.XmlTv
         }
 
         /// <summary>
-        /// Gets the programmes for a specified channel
+        /// Gets the programmes for a specified channel.
         /// </summary>
         /// <param name="channelId">The channel id.</param>
         /// <param name="startDateUtc">The UTC start date.</param>
         /// <param name="endDateUtc">The UTC end date.</param>
         /// <param name="cancellationToken">A cancellation token.</param>
-        /// <returns></returns>
+        /// <returns>The programmes for a specified channel.</returns>
         public IEnumerable<XmlTvProgram> GetProgrammes(
             string channelId,
             DateTimeOffset startDateUtc,
@@ -251,6 +254,7 @@ namespace Jellyfin.XmlTv
                                         ProcessCredits(subtree, result);
                                     }
                                 }
+
                                 break;
                             case "icon":
                                 result.Icon = ProcessIconNode(xmlProg);
@@ -259,7 +263,7 @@ namespace Jellyfin.XmlTv
                             case "premiere":
                                 result.Premiere = new XmlTvPremiere();
                                 // This was causing data after the premiere node to not be read. Reactivate this and debug if the premiere details are ever needed.
-                                //ProcessPremiereNode(xmlProg, result);
+                                // ProcessPremiereNode(xmlProg, result);
                                 xmlProg.Skip();
                                 break;
                             default:
@@ -274,18 +278,20 @@ namespace Jellyfin.XmlTv
                     }
                 }
             }
+
             return result;
         }
 
         /// <summary>
-        /// Gets the list of supported languages in the XML
+        /// Gets the list of supported languages in the XML.
         /// </summary>
-        /// <returns></returns>
+        /// <param name="cancellationToken">A cancellation token that may be used to cancel the operation.</param>
+        /// <returns>The list of supported languages in the XML.</returns>
         public List<XmlTvLanguage> GetLanguages(CancellationToken cancellationToken)
         {
             var results = new Dictionary<string, int>();
 
-            //Loop through and parse out all elements and then lang= attributes
+            // Loop through and parse out all elements and then lang= attributes
             using (var reader = CreateXmlTextReader(_fileName))
             {
                 while (reader.Read())
@@ -541,6 +547,7 @@ namespace Jellyfin.XmlTv
             {
                 return;
             }
+
             var parts = value.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
 
             if (parts.Length != 2)
@@ -583,6 +590,9 @@ namespace Jellyfin.XmlTv
 
         public void ParseEpisodeDataForOnScreen(XmlReader reader, XmlTvProgram result)
         {
+            _ = reader;
+            _ = result;
+
             // example: 'Episode #FFEE'
             // TODO: This could be textual - how do we populate an Int32
 
@@ -611,7 +621,7 @@ namespace Jellyfin.XmlTv
         {
             var value = reader.ReadElementContentAsString();
 
-            value = value.Replace(" ", "");
+            value = value.Replace(" ", string.Empty);
 
             // Episode details
             var components = value.Split('.');
@@ -622,7 +632,6 @@ namespace Jellyfin.XmlTv
                 // Handle either "5/12" or "5"
                 var seriesComponents = components[0].Split('/');
 
-                
                 // handle the zero basing!
                 if (int.TryParse(seriesComponents[0], out parsedInt))
                 {
@@ -646,7 +655,7 @@ namespace Jellyfin.XmlTv
                     if (int.TryParse(episodeComponents[0], out parsedInt))
                     {
                         result.Episode.Episode = parsedInt + 1;
-                        if (episodeComponents.Count() == 2
+                        if (episodeComponents.Length == 2
                             && int.TryParse(episodeComponents[1], out parsedInt))
                         {
                             result.Episode.EpisodeCount = parsedInt;
@@ -666,7 +675,7 @@ namespace Jellyfin.XmlTv
                     if (int.TryParse(partComponents[0], out parsedInt))
                     {
                         result.Episode.Part = parsedInt + 1;
-                        if (partComponents.Count() == 2
+                        if (partComponents.Length == 2
                             && int.TryParse(partComponents[1], out parsedInt))
                         {
                             result.Episode.PartCount = parsedInt;
@@ -714,11 +723,11 @@ namespace Jellyfin.XmlTv
             <category lang="en">News</category>
             */
 
-            result.Categories = result.Categories ?? new List<string>();
             ProcessMultipleNodes(reader, s => result.Categories.Add(s), _language);
 
-            //result.Categories.Add(reader.ReadElementContentAsString());
+            // result.Categories.Add(reader.ReadElementContentAsString());
         }
+
         public void ProcessCountry(XmlReader reader, XmlTvProgram result)
         {
             /*
@@ -726,7 +735,6 @@ namespace Jellyfin.XmlTv
             <country>EE.UU</country>
             */
 
-            result.Countries = result.Countries ?? new List<string>();
             ProcessNode(reader, s => result.Countries.Add(s), _language);
         }
 
@@ -753,7 +761,8 @@ namespace Jellyfin.XmlTv
         public void ProcessPremiereNode(XmlReader reader, XmlTvProgram result)
         {
             // <title lang="en">Gino&apos;s Italian Escape</title>
-            ProcessNode(reader,
+            ProcessNode(
+                reader,
                 s =>
                 {
                     if (result.Premiere == null)
@@ -764,7 +773,8 @@ namespace Jellyfin.XmlTv
                     {
                         result.Premiere.Details = s;
                     }
-                }, _language);
+                },
+                _language);
         }
 
         public XmlTvIcon ProcessIconNode(XmlReader reader)
@@ -780,16 +790,14 @@ namespace Jellyfin.XmlTv
             }
 
             var widthString = reader.GetAttribute("width");
-            var width = 0;
-            if (!string.IsNullOrEmpty(widthString) && int.TryParse(widthString, out width))
+            if (!string.IsNullOrEmpty(widthString) && int.TryParse(widthString, out int width))
             {
                 result.Width = width;
                 isPopulated = true;
             }
 
             var heightString = reader.GetAttribute("height");
-            var height = 0;
-            if (!string.IsNullOrEmpty(heightString) && int.TryParse(heightString, out height))
+            if (!string.IsNullOrEmpty(heightString) && int.TryParse(heightString, out int height))
             {
                 result.Height = height;
                 isPopulated = true;
@@ -797,7 +805,6 @@ namespace Jellyfin.XmlTv
 
             return isPopulated ? result : null;
         }
-
 
         public void ProcessNodeWithLanguage(XmlReader reader, Action<string> setter)
         {
@@ -819,7 +826,7 @@ namespace Jellyfin.XmlTv
                 reader.Skip();
             }
 
-            result = String.IsNullOrEmpty(result) ? resultCandidate : result;
+            result = string.IsNullOrEmpty(result) ? resultCandidate : result;
             setter(result);
         }
 
@@ -851,10 +858,7 @@ namespace Jellyfin.XmlTv
             var currentValue = reader.ReadElementContentAsString();
             results.Add((currentValue, lang));
 
-            if (allOccurrencesSetter != null)
-            {
-                allOccurrencesSetter(currentValue);
-            }
+            allOccurrencesSetter?.Invoke(currentValue);
 
             while (!reader.EOF && reader.ReadState == ReadState.Interactive)
             {
@@ -865,10 +869,7 @@ namespace Jellyfin.XmlTv
                         lang = reader.HasAttributes ? reader.GetAttribute("lang") : null;
                         currentValue = reader.ReadElementContentAsString();
 
-                        if (allOccurrencesSetter != null)
-                        {
-                            allOccurrencesSetter(currentValue);
-                        }
+                        allOccurrencesSetter?.Invoke(currentValue);
 
                         results.Add((currentValue, lang));
                     }
@@ -949,15 +950,15 @@ namespace Jellyfin.XmlTv
                 }
             }
 
-            if (values.Count(v => v.language == languageRequired) > 0)
+            if (values.Any(v => v.language == languageRequired))
             {
                 values.RemoveAll(v => v.language != languageRequired);
             }
 
-            // ENumerate and return all the matches
-            foreach (var result in values)
+            // Enumerate and return all the matches
+            foreach (var (language, value) in values)
             {
-                setter(result.value);
+                setter(value);
             }
         }
 
@@ -1046,7 +1047,11 @@ namespace Jellyfin.XmlTv
                 dateComponent = dateComponent + completeDate.Substring(dateComponent.Length, completeDate.Length - dateComponent.Length);
             }
 
-            var standardDate = string.Format("{0} {1}", dateComponent, dateOffset);
+            var standardDate = string.Format(
+                CultureInfo.InvariantCulture,
+                "{0} {1}",
+                dateComponent,
+                dateOffset);
             if (DateTimeOffset.TryParseExact(standardDate, "yyyyMMddHHmmss zzz", CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTimeOffset parsedDateTime))
             {
                 return parsedDateTime.ToUniversalTime();
@@ -1074,7 +1079,11 @@ namespace Jellyfin.XmlTv
                 dateComponent = dateComponent + completeDate.Substring(dateComponent.Length, completeDate.Length - dateComponent.Length);
             }
 
-            return string.Format("{0} {1}", dateComponent, dateOffset);
+            return string.Format(
+                CultureInfo.InvariantCulture,
+                "{0} {1}",
+                dateComponent,
+                dateOffset);
         }
     }
 }
