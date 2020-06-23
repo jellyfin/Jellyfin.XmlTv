@@ -593,7 +593,7 @@ namespace Jellyfin.XmlTv
             // example: 'Episode #FFEE'
             // TODO: This could be textual - how do we populate an Int32
 
-            //  var value = reader.ReadElementContentAsString();
+            // var value = reader.ReadElementContentAsString();
             // value = HttpUtility.HtmlDecode(value);
             // value = value.Replace(" ", "");
 
