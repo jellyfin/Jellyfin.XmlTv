@@ -586,8 +586,9 @@ namespace Jellyfin.XmlTv
 
         public void ParseEpisodeDataForOnScreen(XmlReader reader, XmlTvProgram result)
         {
-            _ = reader;
-            _ = result;
+            reader.Skip();
+            // _ = reader;
+            // _ = result;
 
             // example: 'Episode #FFEE'
             // TODO: This could be textual - how do we populate an Int32
