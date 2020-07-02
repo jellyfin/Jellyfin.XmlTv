@@ -409,7 +409,7 @@ namespace Jellyfin.XmlTv
             if (reader.Name == "value")
             {
                 var textValue = reader.ReadElementContentAsString();
-                int index = textValue.IndexOf('/', StringComparison.InvariantCulture);
+                int index = textValue.IndexOf('/', StringComparison.Ordinal);
                 if (index != -1)
                 {
                     var substring = textValue.Substring(index);
@@ -618,7 +618,7 @@ namespace Jellyfin.XmlTv
         {
             var value = reader.ReadElementContentAsString();
 
-            value = value.Replace(" ", string.Empty, StringComparison.InvariantCulture);
+            value = value.Replace(" ", string.Empty, StringComparison.Ordinal);
 
             // Episode details
             var components = value.Split('.');

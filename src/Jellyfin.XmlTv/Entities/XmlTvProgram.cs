@@ -86,7 +86,7 @@ namespace Jellyfin.XmlTv.Entities
 
         /// <inheritdoc />
         public override int GetHashCode()
-            => (ChannelId.GetHashCode(StringComparison.InvariantCulture) * 17) + (StartDate.GetHashCode() * 17) + (EndDate.GetHashCode() * 17);
+            => (ChannelId.GetHashCode(StringComparison.Ordinal) * 17) + (StartDate.GetHashCode() * 17) + (EndDate.GetHashCode() * 17);
 
         /// <inheritdoc />
         public override string ToString()
