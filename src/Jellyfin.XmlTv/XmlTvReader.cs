@@ -409,7 +409,7 @@ namespace Jellyfin.XmlTv
             if (reader.Name == "value")
             {
                 var textValue = reader.ReadElementContentAsString();
-                int index = textValue.IndexOf('/');
+                int index = textValue.IndexOf('/', StringComparison.InvariantCulture);
                 if (index != -1)
                 {
                     var substring = textValue.Substring(index);
@@ -471,7 +471,7 @@ namespace Jellyfin.XmlTv
                     ParseEpisodeDataForXmlTvNs(reader, result);
                     break;
                 case "onscreen":
-                    ParseEpisodeDataForOnScreen(reader, result);
+                    ParseEpisodeDataForOnScreen(reader);
                     break;
                 case "thetvdb.com":
                     ParseTvdbSystem(reader, result);
@@ -584,7 +584,7 @@ namespace Jellyfin.XmlTv
             }
         }
 
-        public void ParseEpisodeDataForOnScreen(XmlReader reader, XmlTvProgram result)
+        public void ParseEpisodeDataForOnScreen(XmlReader reader)
         {
             reader.Skip();
             // _ = reader;
@@ -618,7 +618,7 @@ namespace Jellyfin.XmlTv
         {
             var value = reader.ReadElementContentAsString();
 
-            value = value.Replace(" ", string.Empty);
+            value = value.Replace(" ", string.Empty, StringComparison.InvariantCulture);
 
             // Episode details
             var components = value.Split('.');

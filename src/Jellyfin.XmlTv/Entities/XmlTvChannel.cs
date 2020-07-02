@@ -39,7 +39,7 @@ namespace Jellyfin.XmlTv.Entities
 
         /// <inheritdoc />
         public override int GetHashCode()
-            => Id.GetHashCode() * 17;
+            => Id.GetHashCode(StringComparison.InvariantCulture) * 17;
 
         /// <inheritdoc />
         public override string ToString()
