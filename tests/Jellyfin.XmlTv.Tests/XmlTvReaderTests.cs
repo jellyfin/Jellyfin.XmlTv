@@ -208,5 +208,29 @@ namespace Jellyfin.XmlTv.Test
                 startDate.AddMonths(1)).ToList();
             Assert.Equal(297, programs.Count);
         }
+
+        [Fact]
+        public void SchedulesDirectTest()
+        {
+            var testFile = Path.Join("Test Data", "schedulesdirect.xml");
+            var reader = new XmlTvReader(testFile, null);
+
+            var channels = reader.GetChannels().ToList();
+
+            // Pick a channel to check the data for
+            var channel = channels.SingleOrDefault(c => c.Id == "EPG123.10108.schedulesdirect.org"); // CTV Toronto
+            Assert.NotNull(channel);
+
+            var startDate = new DateTimeOffset(2020, 07, 29, 0, 0, 0, new TimeSpan());
+            var cancellationToken = new CancellationToken();
+            var programmes = reader.GetProgrammes(channel.Id, startDate, startDate.AddDays(1), cancellationToken).ToList();
+
+            var programme = programmes.SingleOrDefault(p => p.Title == "Match Game");
+            Assert.NotNull(programme.Episode);
+            Assert.True(programme.Credits.Count == 9);
+
+            Assert.NotNull(programme.Icon);
+            Assert.True(programme.Icon.Width > programme.Icon.Height);
+        }
     }
 }

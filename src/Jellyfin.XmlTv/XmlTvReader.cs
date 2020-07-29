@@ -256,8 +256,18 @@ namespace Jellyfin.XmlTv
 
                                 break;
                             case "icon":
-                                result.Icon = ProcessIconNode(xmlProg);
+                                if (result.Icon == null)
+                                {
+                                    XmlTvIcon icon = ProcessIconNode(xmlProg);
+                                    // Set the icon only if the width is greater than the height (i.e. the icon is a banner rather than a poster)
+                                    if (icon != null && icon.Width.GetValueOrDefault() > icon.Height.GetValueOrDefault())
+                                    {
+                                        result.Icon = icon;
+                                    }
+                                }
+
                                 xmlProg.Skip();
+
                                 break;
                             case "premiere":
                                 ProcessPremiereNode(xmlProg, result);
@@ -769,6 +779,44 @@ namespace Jellyfin.XmlTv
 
         public XmlTvIcon ProcessIconNode(XmlReader reader)
         {
+            /*
+            var isPopulated = false;
+
+            var result = new XmlTvIcon();
+
+            var source = reader.GetAttribute("src");
+            if (!string.IsNullOrEmpty(source))
+            {
+                result.Source = source;
+                isPopulated = true;
+            }
+
+            var widthString = reader.GetAttribute("width");
+            var heightString = reader.GetAttribute("height");
+
+            int? iconWidth = !string.IsNullOrEmpty(widthString) && int.TryParse(widthString, out int width) ? (int?)width : null;
+            int? iconHeight = !string.IsNullOrEmpty(heightString) && int.TryParse(heightString, out int height) ? (int?)height : null;
+
+            if (iconWidth != null && iconHeight != null)
+            {
+                if ((isProgram && iconWidth > iconHeight) || (!isProgram && iconHeight > iconWidth))
+                {
+                    result.Width = iconWidth;
+                    result.Height = iconHeight;
+                    return result;
+                }
+                else
+                {
+                    return isPopulated ? result : null;
+                }
+            }
+            else
+            {
+                return isPopulated ? result : null;
+            }
+
+            */
+
             var result = new XmlTvIcon();
             var isPopulated = false;
 
