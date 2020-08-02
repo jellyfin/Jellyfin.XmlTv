@@ -256,8 +256,22 @@ namespace Jellyfin.XmlTv
 
                                 break;
                             case "icon":
-                                result.Icon = ProcessIconNode(xmlProg);
+                                XmlTvIcon icon = ProcessIconNode(xmlProg);
+                                if (result.Icon == null)
+                                {
+                                    result.Icon = icon; // If there is no icon set then set the processed icon (which could also be null)
+                                }
+                                else
+                                {
+                                    // If there is already an icon set (which could be a poster) then replace it with a banner
+                                    if (icon != null && icon.Width.GetValueOrDefault() > icon.Height.GetValueOrDefault())
+                                    {
+                                        result.Icon = icon;
+                                    }
+                                }
+
                                 xmlProg.Skip();
+
                                 break;
                             case "premiere":
                                 ProcessPremiereNode(xmlProg, result);
