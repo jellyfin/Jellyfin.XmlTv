@@ -20,40 +20,40 @@ namespace Jellyfin.XmlTv.Test
             // Check each channel
             var channel = channels.SingleOrDefault(c => c.Id == "UK_RT_2667");
             Assert.NotNull(channel);
-            Assert.Equal("BBC1 HD", channel.DisplayName);
+            Assert.Equal("BBC1 HD", channel!.DisplayName);
             Assert.Equal("7.1", channel.Number);
             Assert.NotNull(channel.Icon);
-            Assert.Equal("Logo_UK_RT_2667", channel.Icon.Source);
+            Assert.Equal("Logo_UK_RT_2667", channel!.Icon!.Source);
             Assert.Equal(100, channel.Icon.Width);
             Assert.Equal(200, channel.Icon.Height);
 
             channel = channels.SingleOrDefault(c => c.Id == "UK_RT_105");
             Assert.NotNull(channel);
-            Assert.Equal("BBC2", channel.DisplayName);
+            Assert.Equal("BBC2", channel!.DisplayName);
             Assert.NotNull(channel.Icon);
-            Assert.Equal("Logo_UK_RT_105", channel.Icon.Source);
+            Assert.Equal("Logo_UK_RT_105", channel!.Icon!.Source);
             Assert.False(channel.Icon.Width.HasValue);
             Assert.False(channel.Icon.Height.HasValue);
 
             channel = channels.SingleOrDefault(c => c.Id == "UK_RT_2118");
             Assert.NotNull(channel);
-            Assert.Equal("ITV1 HD", channel.DisplayName);
+            Assert.Equal("ITV1 HD", channel!.DisplayName);
             Assert.NotNull(channel.Icon);
-            Assert.Equal("Logo_UK_RT_2118", channel.Icon.Source);
+            Assert.Equal("Logo_UK_RT_2118", channel!.Icon!.Source);
             Assert.Equal(100, channel.Icon.Width);
             Assert.False(channel.Icon.Height.HasValue);
 
             channel = channels.SingleOrDefault(c => c.Id == "UK_RT_2056");
             Assert.NotNull(channel);
-            Assert.Equal("Channel 4 HD", channel.DisplayName);
+            Assert.Equal("Channel 4 HD", channel!.DisplayName);
             Assert.NotNull(channel.Icon);
-            Assert.Equal("Logo_UK_RT_2056", channel.Icon.Source);
+            Assert.Equal("Logo_UK_RT_2056", channel!.Icon!.Source);
             Assert.False(channel.Icon.Width.HasValue);
             Assert.Equal(200, channel.Icon.Height);
 
             channel = channels.SingleOrDefault(c => c.Id == "UK_RT_134");
             Assert.NotNull(channel);
-            Assert.Equal("Channel 5", channel.DisplayName);
+            Assert.Equal("Channel 5", channel!.DisplayName);
             Assert.Null(channel.Icon);
         }
 
@@ -72,13 +72,13 @@ namespace Jellyfin.XmlTv.Test
 
             var startDate = new DateTimeOffset(2015, 11, 26, 0, 0, 0, new TimeSpan());
             var cancellationToken = new CancellationToken();
-            var programmes = reader.GetProgrammes(channel.Id, startDate, startDate.AddDays(1), cancellationToken).ToList();
+            var programmes = reader.GetProgrammes(channel!.Id, startDate, startDate.AddDays(1), cancellationToken).ToList();
 
             Assert.Equal(27, programmes.Count);
             var programme = programmes.SingleOrDefault(p => p.Title == "The Secret Life of");
 
             Assert.NotNull(programme);
-            Assert.Equal(new DateTimeOffset(2015, 11, 26, 20, 0, 0, 0, new TimeSpan()), programme.StartDate);
+            Assert.Equal(new DateTimeOffset(2015, 11, 26, 20, 0, 0, 0, new TimeSpan()), programme!.StartDate);
             Assert.Equal(new DateTimeOffset(2015, 11, 26, 21, 0, 0, 0, new TimeSpan()), programme.EndDate);
             Assert.Equal("Cameras follow the youngsters' development after two weeks apart and time has made the heart grow fonder for Alfie and Emily, who are clearly happy to be back together. And although Alfie struggled to empathise with the rest of his peers before, a painting competition proves to be a turning point for him. George takes the children's rejection of his family recipe to heart, but goes on to triumph elsewhere, and romance is in the air when newcomer Sienna captures Arthur's heart.", programme.Description);
             Assert.Equal("Documentary", programme.Categories.Single());
@@ -89,7 +89,7 @@ namespace Jellyfin.XmlTv.Test
             Assert.Equal(4, programme.Episode.Episode);
             Assert.Equal(6, programme.Episode.EpisodeCount);
             Assert.NotNull(programme.Premiere);
-            Assert.Equal("First showing on national terrestrial TV", programme.Premiere.Details);
+            Assert.Equal("First showing on national terrestrial TV", programme!.Premiere!.Details);
             Assert.True(programme.IsNew);
         }
 
@@ -148,7 +148,7 @@ namespace Jellyfin.XmlTv.Test
 
             var startDate = new DateTimeOffset(2016, 02, 18, 0, 0, 0, new TimeSpan());
             var cancellationToken = new CancellationToken();
-            var programmes = reader.GetProgrammes(channel.Id, startDate, startDate.AddDays(1), cancellationToken).ToList();
+            var programmes = reader.GetProgrammes(channel!.Id, startDate, startDate.AddDays(1), cancellationToken).ToList();
 
             Assert.Equal(22, programmes.Count);
             var programme = programmes.SingleOrDefault(p => p.Title == "This is Comedy. Judd Apatow & Co.");
@@ -176,7 +176,7 @@ namespace Jellyfin.XmlTv.Test
             */
 
             Assert.NotNull(programme);
-            Assert.Equal(new DateTimeOffset(2016, 02, 18, 4, 51, 0, new TimeSpan()), programme.StartDate);
+            Assert.Equal(new DateTimeOffset(2016, 02, 18, 4, 51, 0, new TimeSpan()), programme!.StartDate);
             Assert.Equal(new DateTimeOffset(2016, 02, 18, 5, 54, 0, new TimeSpan()), programme.EndDate);
             Assert.Equal("El resurgir creativo de la comedia estadounidense en los últimos 15 años ha tenido un nombre indiscutible, Judd Apatow, y unos colaboradores indispensables, sus amigos (actores, cómicos, escritores) Jonah Hill, Steve Carrell, Paul Rudd, Seth Rogen, Lena Dunham... A través de extractos de sus filmes y de entrevistas a algunos los miembros de su 'banda' (Adam Sandler, Lena Dunham o Jason Segel), este documental muestra la carrera de un productor y director excepcional que ha sido capaz de llevar la risa a su máxima expresión", programme.Description);
             Assert.Equal(2, programme.Categories.Count);
@@ -223,14 +223,14 @@ namespace Jellyfin.XmlTv.Test
 
             var startDate = new DateTimeOffset(2020, 07, 29, 0, 0, 0, new TimeSpan());
             var cancellationToken = new CancellationToken();
-            var programmes = reader.GetProgrammes(channel.Id, startDate, startDate.AddDays(1), cancellationToken).ToList();
+            var programmes = reader.GetProgrammes(channel!.Id, startDate, startDate.AddDays(1), cancellationToken).ToList();
 
             var programme = programmes.SingleOrDefault(p => p.Title == "Match Game");
-            Assert.NotNull(programme.Episode);
+            Assert.NotNull(programme!.Episode);
             Assert.True(programme.Credits.Count == 9);
 
             Assert.NotNull(programme.Icon);
-            Assert.True(programme.Icon.Width > programme.Icon.Height);
+            Assert.True(programme!.Icon!.Width > programme.Icon.Height);
         }
     }
 }

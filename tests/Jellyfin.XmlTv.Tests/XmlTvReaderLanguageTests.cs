@@ -35,10 +35,10 @@ namespace Jellyfin.XmlTv.Test
 
             var startDate = new DateTime(2015, 11, 26);
             var cancellationToken = new CancellationToken();
-            var programme = reader.GetProgrammes(channel.Id, startDate, startDate.AddDays(1), cancellationToken).FirstOrDefault();
+            var programme = reader.GetProgrammes(channel!.Id, startDate, startDate.AddDays(1), cancellationToken).FirstOrDefault();
 
             Assert.NotNull(programme);
-            Assert.Equal("Homes Under the Hammer - Spanish", programme.Title);
+            Assert.Equal("Homes Under the Hammer - Spanish", programme!.Title);
             Assert.Single(programme.Categories);
             Assert.Equal("Property - Spanish", programme.Categories[0]);
         }
@@ -54,10 +54,10 @@ namespace Jellyfin.XmlTv.Test
 
             var startDate = new DateTime(2015, 11, 26);
             var cancellationToken = new CancellationToken();
-            var programme = reader.GetProgrammes(channel.Id, startDate, startDate.AddDays(1), cancellationToken).FirstOrDefault();
+            var programme = reader.GetProgrammes(channel!.Id, startDate, startDate.AddDays(1), cancellationToken).FirstOrDefault();
 
             Assert.NotNull(programme);
-            Assert.Equal("Homes Under the Hammer - English", programme.Title);
+            Assert.Equal("Homes Under the Hammer - English", programme!.Title);
             Assert.Single(programme.Categories);
             Assert.Equal("Property - English", programme.Categories[0]);
         }
@@ -73,10 +73,10 @@ namespace Jellyfin.XmlTv.Test
 
             var startDate = new DateTime(2015, 11, 26);
             var cancellationToken = new CancellationToken();
-            var programme = reader.GetProgrammes(channel.Id, startDate, startDate.AddDays(1), cancellationToken).FirstOrDefault();
+            var programme = reader.GetProgrammes(channel!.Id, startDate, startDate.AddDays(1), cancellationToken).FirstOrDefault();
 
             Assert.NotNull(programme);
-            Assert.Equal("Homes Under the Hammer - No Language", programme.Title);
+            Assert.Equal("Homes Under the Hammer - No Language", programme!.Title);
             Assert.Single(programme.Categories);
             Assert.Equal("Property - No Language", programme.Categories[0]);
         }
@@ -92,10 +92,10 @@ namespace Jellyfin.XmlTv.Test
 
             var startDate = new DateTime(2015, 11, 26);
             var cancellationToken = new CancellationToken();
-            var programme = reader.GetProgrammes(channel.Id, startDate, startDate.AddDays(1), cancellationToken).FirstOrDefault();
+            var programme = reader.GetProgrammes(channel!.Id, startDate, startDate.AddDays(1), cancellationToken).FirstOrDefault();
 
             Assert.NotNull(programme);
-            Assert.Equal("Homes Under the Hammer - Empty Language", programme.Title);
+            Assert.Equal("Homes Under the Hammer - Empty Language", programme!.Title);
             Assert.Single(programme.Categories);
             Assert.Equal("Property - Empty Language", programme.Categories[0]);
         }
@@ -111,10 +111,10 @@ namespace Jellyfin.XmlTv.Test
 
             var startDate = new DateTime(2015, 11, 26);
             var cancellationToken = new CancellationToken();
-            var programme = reader.GetProgrammes(channel.Id, startDate, startDate.AddDays(1), cancellationToken).Skip(1).FirstOrDefault();
+            var programme = reader.GetProgrammes(channel!.Id, startDate, startDate.AddDays(1), cancellationToken).Skip(1).FirstOrDefault();
 
             Assert.NotNull(programme);
-            Assert.Equal("Homes Under the Hammer - No Language", programme.Title);
+            Assert.Equal("Homes Under the Hammer - No Language", programme!.Title);
 
             // Should return all categories
             Assert.Equal(2, programme.Categories.Count);
@@ -133,10 +133,10 @@ namespace Jellyfin.XmlTv.Test
 
             var startDate = new DateTime(2015, 11, 26);
             var cancellationToken = new CancellationToken();
-            var programme = reader.GetProgrammes(channel.Id, startDate, startDate.AddDays(1), cancellationToken).Skip(1).FirstOrDefault();
+            var programme = reader.GetProgrammes(channel!.Id, startDate, startDate.AddDays(1), cancellationToken).Skip(1).FirstOrDefault();
 
             Assert.NotNull(programme);
-            Assert.Equal("Homes Under the Hammer - No Language", programme.Title); // Should return the first in the list
+            Assert.Equal("Homes Under the Hammer - No Language", programme!.Title); // Should return the first in the list
 
             // Should return all categories
             Assert.Equal(2, programme.Categories.Count);

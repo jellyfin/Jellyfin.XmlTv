@@ -1,4 +1,3 @@
-#pragma warning disable SA1600
 #pragma warning disable CS1591
 
 using System.Globalization;
@@ -7,9 +6,15 @@ namespace Jellyfin.XmlTv.Entities
 {
     public class XmlTvCredit
     {
-        public XmlTvCreditType Type { get; set; }
+        public XmlTvCredit(XmlTvCreditType type, string name)
+        {
+            Type = type;
+            Name = name;
+        }
 
-        public string Name { get; set; }
+        public XmlTvCreditType Type { get; }
+
+        public string Name { get; }
 
         /// <inheritdoc />
         public override string ToString()

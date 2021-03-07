@@ -18,17 +18,16 @@ namespace Jellyfin.XmlTv
         private const string DateWithOffsetRegex = @"^(?<dateDigits>[0-9]{4,14})(\s(?<dateOffset>[+-]*[0-9]{1,4}))?$";
 
         private readonly string _fileName;
-        private readonly string _language;
+        private readonly string? _language;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="XmlTvReader" /> class.
         /// </summary>
         /// <param name="fileName">Name of the file.</param>
         /// <param name="language">The specific language to return.</param>
-        public XmlTvReader(string fileName, string language = null)
+        public XmlTvReader(string fileName, string? language = null)
         {
             _fileName = fileName;
-
             _language = language;
         }
 
@@ -73,7 +72,7 @@ namespace Jellyfin.XmlTv
             return list;
         }
 
-        private XmlTvChannel GetChannel(XmlReader reader)
+        private XmlTvChannel? GetChannel(XmlReader reader)
         {
             var id = reader.GetAttribute("id");
 
@@ -82,7 +81,7 @@ namespace Jellyfin.XmlTv
                 return null;
             }
 
-            var result = new XmlTvChannel() { Id = id };
+            var result = new XmlTvChannel(id);
 
             using (var xmlChannel = reader.ReadSubtree())
             {
@@ -176,25 +175,26 @@ namespace Jellyfin.XmlTv
             return list;
         }
 
-        public XmlTvProgram GetProgramme(XmlReader reader, string channelId, DateTimeOffset startDateUtc, DateTimeOffset endDateUtc)
+        public XmlTvProgram? GetProgramme(XmlReader reader, string channelId, DateTimeOffset startDateUtc, DateTimeOffset endDateUtc)
         {
-            var result = new XmlTvProgram();
+            var id = reader.GetAttribute("channel");
+
+            // First up, validate that this is the correct channel, and programme is within the time we are expecting
+            if (id == null || !string.Equals(id, channelId, StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+
+            var result = new XmlTvProgram(id);
 
             PopulateHeader(reader, result);
+            if (result.EndDate < startDateUtc || result.StartDate >= endDateUtc)
+            {
+                return null;
+            }
 
             using (var xmlProg = reader.ReadSubtree())
             {
-                // First up, validate that this is the correct channel, and programme is within the time we are expecting
-                if (!string.Equals(result.ChannelId, channelId, StringComparison.OrdinalIgnoreCase))
-                {
-                    return null;
-                }
-
-                if (result.EndDate < startDateUtc || result.StartDate >= endDateUtc)
-                {
-                    return null;
-                }
-
                 xmlProg.MoveToContent();
                 xmlProg.Read();
 
@@ -256,7 +256,7 @@ namespace Jellyfin.XmlTv
 
                                 break;
                             case "icon":
-                                XmlTvIcon icon = ProcessIconNode(xmlProg);
+                                XmlTvIcon? icon = ProcessIconNode(xmlProg);
                                 if (result.Icon == null)
                                 {
                                     result.Icon = icon; // If there is no icon set then set the processed icon (which could also be null)
@@ -327,7 +327,7 @@ namespace Jellyfin.XmlTv
                 }
             }
 
-            return results.Keys.Select(k => new XmlTvLanguage() { Name = k, Relevance = results[k] })
+            return results.Keys.Select(k => new XmlTvLanguage(k, results[k]))
                     .OrderByDescending(l => l.Relevance)
                     .ToList();
         }
@@ -359,44 +359,43 @@ namespace Jellyfin.XmlTv
             {
                 if (creditsXml.NodeType == XmlNodeType.Element)
                 {
-                    XmlTvCredit credit = null;
+                    XmlTvCredit? credit = null;
                     switch (creditsXml.Name)
                     {
                         case "director":
-                            credit = new XmlTvCredit() { Type = XmlTvCreditType.Director };
+                            credit = new XmlTvCredit(XmlTvCreditType.Director, creditsXml.ReadElementContentAsString());
                             break;
                         case "actor":
-                            credit = new XmlTvCredit() { Type = XmlTvCreditType.Actor };
+                            credit = new XmlTvCredit(XmlTvCreditType.Actor, creditsXml.ReadElementContentAsString());
                             break;
                         case "writer":
-                            credit = new XmlTvCredit() { Type = XmlTvCreditType.Writer };
+                            credit = new XmlTvCredit(XmlTvCreditType.Writer, creditsXml.ReadElementContentAsString());
                             break;
                         case "adapter":
-                            credit = new XmlTvCredit() { Type = XmlTvCreditType.Adapter };
+                            credit = new XmlTvCredit(XmlTvCreditType.Adapter, creditsXml.ReadElementContentAsString());
                             break;
                         case "producer":
-                            credit = new XmlTvCredit() { Type = XmlTvCreditType.Producer };
+                            credit = new XmlTvCredit(XmlTvCreditType.Producer, creditsXml.ReadElementContentAsString());
                             break;
                         case "composer":
-                            credit = new XmlTvCredit() { Type = XmlTvCreditType.Composer };
+                            credit = new XmlTvCredit(XmlTvCreditType.Composer, creditsXml.ReadElementContentAsString());
                             break;
                         case "editor":
-                            credit = new XmlTvCredit() { Type = XmlTvCreditType.Editor };
+                            credit = new XmlTvCredit(XmlTvCreditType.Editor, creditsXml.ReadElementContentAsString());
                             break;
                         case "presenter":
-                            credit = new XmlTvCredit() { Type = XmlTvCreditType.Presenter };
+                            credit = new XmlTvCredit(XmlTvCreditType.Presenter, creditsXml.ReadElementContentAsString());
                             break;
                         case "commentator":
-                            credit = new XmlTvCredit() { Type = XmlTvCreditType.Commentator };
+                            credit = new XmlTvCredit(XmlTvCreditType.Commentator, creditsXml.ReadElementContentAsString());
                             break;
                         case "guest":
-                            credit = new XmlTvCredit() { Type = XmlTvCreditType.Guest };
+                            credit = new XmlTvCredit(XmlTvCreditType.Guest, creditsXml.ReadElementContentAsString());
                             break;
                     }
 
                     if (credit != null)
                     {
-                        credit.Name = creditsXml.ReadElementContentAsString();
                         result.Credits.Add(credit);
                     }
                     else
@@ -452,10 +451,9 @@ namespace Jellyfin.XmlTv
             reader.ReadToDescendant("value");
             if (reader.Name == "value")
             {
-                result.Rating = new XmlTvRating()
+                result.Rating = new XmlTvRating(reader.ReadElementContentAsString())
                 {
-                    System = system,
-                    Value = reader.ReadElementContentAsString()
+                    System = system
                 };
             }
             else
@@ -776,12 +774,12 @@ namespace Jellyfin.XmlTv
                 reader,
                 s =>
                 {
-                    (result.Premiere ??= new XmlTvPremiere()).Details = s;
+                    result.Premiere = new XmlTvPremiere(s);
                 },
                 _language);
         }
 
-        public XmlTvIcon ProcessIconNode(XmlReader reader)
+        public XmlTvIcon? ProcessIconNode(XmlReader reader)
         {
             var result = new XmlTvIcon();
             var isPopulated = false;
@@ -837,8 +835,8 @@ namespace Jellyfin.XmlTv
         public void ProcessNode(
             XmlReader reader,
             Action<string> setter,
-            string languageRequired = null,
-            Action<string> allOccurrencesSetter = null)
+            string? languageRequired = null,
+            Action<string>? allOccurrencesSetter = null)
         {
             /* <title lang="es">Homes Under the Hammer - Spanish</title>
              * <title lang="es">Homes Under the Hammer - Spanish 2</title>
@@ -857,7 +855,7 @@ namespace Jellyfin.XmlTv
              *  - Language = en     Homes Under the Hammer - English
              */
 
-            var results = new List<(string, string)>();
+            var results = new List<(string, string?)>();
 
             // We will always use the first value - so that if there are no matches we can return something
             var currentElementName = reader.Name;
@@ -917,7 +915,7 @@ namespace Jellyfin.XmlTv
             }
         }
 
-        public void ProcessMultipleNodes(XmlReader reader, Action<string> setter, string languageRequired = null)
+        public void ProcessMultipleNodes(XmlReader reader, Action<string> setter, string? languageRequired = null)
         {
             /* <category lang="en">Property - English</category>
              * <category lang="en">Property - English 2</category>
@@ -937,7 +935,7 @@ namespace Jellyfin.XmlTv
              */
 
             var currentElementName = reader.Name;
-            var values = new List<(string language, string value)>()
+            var values = new List<(string? language, string value)>()
             {
                 (reader.GetAttribute("lang"), reader.ReadElementContentAsString())
             };
@@ -986,8 +984,6 @@ namespace Jellyfin.XmlTv
 
         private void PopulateHeader(XmlReader reader, XmlTvProgram result)
         {
-            result.ChannelId = reader.GetAttribute("channel");
-
             var startValue = reader.GetAttribute("start");
             if (string.IsNullOrEmpty(startValue))
             {

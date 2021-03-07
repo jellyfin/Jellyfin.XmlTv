@@ -1,16 +1,19 @@
-#pragma warning disable SA1600
 #pragma warning disable CS1591
 
 namespace Jellyfin.XmlTv.Entities
 {
+    /*
+    <premiere lang="en">
+      First showing on national terrestrial TV
+    </premiere>
+    */
     public class XmlTvPremiere
     {
-        /*
-        <premiere lang="en">
-          First showing on national terrestrial TV
-        </premiere>
-        */
+        public XmlTvPremiere(string details)
+        {
+            Details = details;
+        }
 
-        public string Details { get; set; }
+        public string Details { get; }
     }
 }

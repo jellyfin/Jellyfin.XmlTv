@@ -8,13 +8,22 @@ namespace Jellyfin.XmlTv.Entities
     public class XmlTvRating
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="XmlTvRating"/> class.
+        /// </summary>
+        /// <param name="value">The rating.</param>
+        public XmlTvRating(string value)
+        {
+            Value = value;
+        }
+
+        /// <summary>
         /// Gets or sets the literal name of the rating system.
         /// </summary>
         /// Example: MPAA
-        public string System { get; set; }
+        public string? System { get; set; }
 
         /// <summary>
-        /// Gets or setsthe rating using the system specificed.
+        /// Gets or sets the rating using the system specificed.
         /// </summary>
         // Example: TV-14
         public string Value { get; set; }
@@ -22,12 +31,7 @@ namespace Jellyfin.XmlTv.Entities
         /// <inheritdoc />
         public override string ToString()
         {
-            var builder = new StringBuilder();
-            if (!string.IsNullOrEmpty(Value))
-            {
-                builder.Append(Value);
-            }
-
+            var builder = new StringBuilder(Value);
             if (!string.IsNullOrEmpty(System))
             {
                 builder.Append(" (").Append(System).Append(')');
