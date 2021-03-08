@@ -23,10 +23,10 @@ namespace Jellyfin.XmlTv.Entities
         public string? System { get; set; }
 
         /// <summary>
-        /// Gets or sets the rating using the system specificed.
+        /// Gets the rating using the system specificed.
         /// </summary>
         // Example: TV-14
-        public string Value { get; set; }
+        public string Value { get; }
 
         /// <inheritdoc />
         public override string ToString()
