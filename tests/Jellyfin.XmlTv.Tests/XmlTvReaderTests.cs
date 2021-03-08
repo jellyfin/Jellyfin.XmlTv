@@ -71,8 +71,7 @@ namespace Jellyfin.XmlTv.Test
             Assert.NotNull(channel);
 
             var startDate = new DateTimeOffset(2015, 11, 26, 0, 0, 0, new TimeSpan());
-            var cancellationToken = new CancellationToken();
-            var programmes = reader.GetProgrammes(channel!.Id, startDate, startDate.AddDays(1), cancellationToken).ToList();
+            var programmes = reader.GetProgrammes(channel!.Id, startDate, startDate.AddDays(1)).ToList();
 
             Assert.Equal(27, programmes.Count);
             var programme = programmes.SingleOrDefault(p => p.Title == "The Secret Life of");
@@ -106,8 +105,7 @@ namespace Jellyfin.XmlTv.Test
             */
 
             var startDate = new DateTimeOffset(2015, 11, 26, 0, 0, 0, new TimeSpan());
-            var cancellationToken = new CancellationToken();
-            var programmes = reader.GetProgrammes("UK_RT_2667", startDate, startDate.AddDays(1), cancellationToken).ToList();
+            var programmes = reader.GetProgrammes("UK_RT_2667", startDate, startDate.AddDays(1)).ToList();
             var programme = programmes.SingleOrDefault(p => p.Title == "Homes Under the Hammer - Title 1");
 
             Assert.NotNull(programme);
@@ -126,8 +124,7 @@ namespace Jellyfin.XmlTv.Test
             */
 
             var startDate = new DateTimeOffset(2015, 11, 26, 0, 0, 0, new TimeSpan());
-            var cancellationToken = new CancellationToken();
-            var programmes = reader.GetProgrammes("UK_RT_2667", startDate, startDate.AddDays(1), cancellationToken).ToList();
+            var programmes = reader.GetProgrammes("UK_RT_2667", startDate, startDate.AddDays(1)).ToList();
             var programme = programmes.SingleOrDefault(p => p.Title == "Oxford Street Revealed - Title 1");
 
             Assert.NotNull(programme);
@@ -147,8 +144,7 @@ namespace Jellyfin.XmlTv.Test
             Assert.NotNull(channel);
 
             var startDate = new DateTimeOffset(2016, 02, 18, 0, 0, 0, new TimeSpan());
-            var cancellationToken = new CancellationToken();
-            var programmes = reader.GetProgrammes(channel!.Id, startDate, startDate.AddDays(1), cancellationToken).ToList();
+            var programmes = reader.GetProgrammes(channel!.Id, startDate, startDate.AddDays(1)).ToList();
 
             Assert.Equal(22, programmes.Count);
             var programme = programmes.SingleOrDefault(p => p.Title == "This is Comedy. Judd Apatow & Co.");
@@ -222,8 +218,7 @@ namespace Jellyfin.XmlTv.Test
             Assert.NotNull(channel);
 
             var startDate = new DateTimeOffset(2020, 07, 29, 0, 0, 0, new TimeSpan());
-            var cancellationToken = new CancellationToken();
-            var programmes = reader.GetProgrammes(channel!.Id, startDate, startDate.AddDays(1), cancellationToken).ToList();
+            var programmes = reader.GetProgrammes(channel!.Id, startDate, startDate.AddDays(1)).ToList();
 
             var programme = programmes.SingleOrDefault(p => p.Title == "Match Game");
             Assert.NotNull(programme!.Episode);

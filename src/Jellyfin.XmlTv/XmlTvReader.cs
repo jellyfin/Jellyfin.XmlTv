@@ -297,7 +297,7 @@ namespace Jellyfin.XmlTv
         /// </summary>
         /// <param name="cancellationToken">A cancellation token that may be used to cancel the operation.</param>
         /// <returns>The list of supported languages in the XML.</returns>
-        public List<XmlTvLanguage> GetLanguages(CancellationToken cancellationToken)
+        public List<XmlTvLanguage> GetLanguages(CancellationToken cancellationToken = default)
         {
             var results = new Dictionary<string, int>();
 
