@@ -1,4 +1,3 @@
-#pragma warning disable SA1600
 #pragma warning disable CS1591
 
 using System;
@@ -8,18 +7,23 @@ namespace Jellyfin.XmlTv.Entities
 {
     public class XmlTvChannel : IEquatable<XmlTvChannel>
     {
-        public string Id { get; set; }
+        public XmlTvChannel(string id)
+        {
+            Id = id;
+        }
 
-        public string DisplayName { get; set; }
+        public string Id { get; }
 
-        public string Number { get; set; }
+        public string? DisplayName { get; set; }
 
-        public string Url { get; set; }
+        public string? Number { get; set; }
 
-        public XmlTvIcon Icon { get; set; }
+        public string? Url { get; set; }
+
+        public XmlTvIcon? Icon { get; set; }
 
         /// <inheritdoc />
-        public bool Equals(XmlTvChannel other)
+        public bool Equals(XmlTvChannel? other)
         {
             // If both are null, or both are same instance, return true.
             if (ReferenceEquals(this, other))
@@ -56,7 +60,7 @@ namespace Jellyfin.XmlTv.Entities
         }
 
         /// <inheritdoc />
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
             => obj is XmlTvChannel channel && Equals(channel);
     }
 }

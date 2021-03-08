@@ -1,4 +1,3 @@
-#pragma warning disable SA1600
 #pragma warning disable CS1591
 
 using System.Text;
@@ -15,7 +14,7 @@ namespace Jellyfin.XmlTv.Entities
 
         public int? EpisodeCount { get; set; }
 
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
         public int? Part { get; set; }
 

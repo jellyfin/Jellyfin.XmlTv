@@ -1,4 +1,3 @@
-#pragma warning disable SA1600
 #pragma warning disable CS1591
 
 using System.Text;
@@ -7,7 +6,7 @@ namespace Jellyfin.XmlTv.Entities
 {
     public class XmlTvIcon
     {
-        public string Source { get; set; }
+        public string? Source { get; set; }
 
         public int? Width { get; set; }
 

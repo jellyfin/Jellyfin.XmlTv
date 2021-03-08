@@ -1,5 +1,3 @@
-#pragma warning disable SA1600
-#pragma warning disable SA1602
 #pragma warning disable CS1591
 
 namespace Jellyfin.XmlTv.Entities

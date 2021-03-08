@@ -6,13 +6,24 @@ namespace Jellyfin.XmlTv.Entities
     public class XmlTvLanguage
     {
         /// <summary>
-        /// Gets or sets the name.
+        /// Initializes a new instance of the <see cref="XmlTvLanguage"/> class.
         /// </summary>
-        public string Name { get; set; }
+        /// <param name="name">The language name.</param>
+        /// <param name="relevance">The relevance (number of occurrences) of the language.</param>
+        public XmlTvLanguage(string name, int relevance)
+        {
+            Name = name;
+            Relevance = relevance;
+        }
 
         /// <summary>
-        /// Gets or sets the relevance (number of occurrences) of the language, can be used to order (desc).
+        /// Gets the name.
         /// </summary>
-        public int Relevance { get; set; }
+        public string Name { get; }
+
+        /// <summary>
+        /// Gets the relevance (number of occurrences) of the language, can be used to order (desc).
+        /// </summary>
+        public int Relevance { get; }
     }
 }
