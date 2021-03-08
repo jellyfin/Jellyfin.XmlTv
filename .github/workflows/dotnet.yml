@@ -21,5 +21,7 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-restore --verbosity normal
+      run: dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"
+    - name: Upload coverage to Codecov
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+      run: bash <(curl -s https://codecov.io/bash)
