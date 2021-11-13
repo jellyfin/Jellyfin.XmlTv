@@ -935,21 +935,24 @@ namespace Jellyfin.XmlTv
              */
 
             var currentElementName = reader.Name;
-            var values = new List<(string? language, string value)>()
-            {
-                (reader.GetAttribute("lang"), reader.ReadElementContentAsString())
-            };
+            var values = new List<(string? language, string value)>();
 
-            while (reader.Read())
+            while (!reader.EOF && reader.ReadState == ReadState.Interactive)
             {
-                if (reader.NodeType == XmlNodeType.Element && reader.Name != currentElementName)
+                if (reader.NodeType == XmlNodeType.Element)
                 {
-                    break;
+                    if (reader.Name == currentElementName)
+                    {
+                        values.Add((reader.GetAttribute("lang"), reader.ReadElementContentAsString()));
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
-
-                if (reader.NodeType == XmlNodeType.Element && reader.Name == currentElementName)
+                else
                 {
-                    values.Add((reader.GetAttribute("lang"), reader.ReadElementContentAsString()));
+                    reader.Read();
                 }
             }
 
