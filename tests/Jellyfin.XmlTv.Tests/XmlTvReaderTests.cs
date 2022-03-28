@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using Xunit;
 
-namespace Jellyfin.XmlTv.Test
+namespace Jellyfin.XmlTv.Tests
 {
     public class XmlTvReaderTests
     {
