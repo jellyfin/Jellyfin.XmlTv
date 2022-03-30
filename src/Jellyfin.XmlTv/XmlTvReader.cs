@@ -1,5 +1,4 @@
-#pragma warning disable SA1600
-#pragma warning disable CS1591
+#pragma warning disable CS1591, CA1002
 
 using System;
 using System.Collections.Generic;
@@ -1005,7 +1004,7 @@ namespace Jellyfin.XmlTv
             }
         }
 
-        public DateTimeOffset? ParseDate(string dateValue)
+        public static DateTimeOffset? ParseDate(string dateValue)
         {
             /*
             All dates and times in this DTD follow the same format, loosely based
@@ -1021,41 +1020,51 @@ namespace Jellyfin.XmlTv
                 return null;
             }
 
-            var completeDate = "20000101000000";
+            const string CompleteDate = "20000101000000";
             var dateComponent = string.Empty;
-            var dateOffset = "+00:00";
+            string? dateOffset = null;
             var match = Regex.Match(dateValue, DateWithOffsetRegex);
             if (match.Success)
             {
                 dateComponent = match.Groups["dateDigits"].Value;
                 if (!string.IsNullOrEmpty(match.Groups["dateOffset"].Value))
                 {
-                    dateOffset = match.Groups["dateOffset"].Value; // Add in the colon to ease parsing later
-                    if (dateOffset.Length == 5)
+                    var tmpDateOffset = match.Groups["dateOffset"].Value; // Add in the colon to ease parsing later
+                    if (tmpDateOffset.Length == 5)
                     {
-                        dateOffset = dateOffset.Insert(3, ":"); // Add in the colon to ease parsing later
-                    }
-                    else
-                    {
-                        dateOffset = "+00:00";
+                        dateOffset = tmpDateOffset.Insert(3, ":"); // Add in the colon to ease parsing later
                     }
                 }
+            }
+            else
+            {
+                return null;
             }
 
             // Pad out the date component part to 14 characaters so 2016061509 becomes 20160615090000
             if (dateComponent.Length < 14)
             {
-                dateComponent = dateComponent + completeDate.Substring(dateComponent.Length, completeDate.Length - dateComponent.Length);
+                dateComponent += CompleteDate[dateComponent.Length..];
             }
 
-            var standardDate = string.Format(
-                CultureInfo.InvariantCulture,
-                "{0} {1}",
-                dateComponent,
-                dateOffset);
-            if (DateTimeOffset.TryParseExact(standardDate, "yyyyMMddHHmmss zzz", CultureInfo.CurrentCulture, DateTimeStyles.None, out DateTimeOffset parsedDateTime))
+            if (dateOffset == null)
             {
-                return parsedDateTime.ToUniversalTime();
+                if (DateTimeOffset.TryParseExact(dateComponent, "yyyyMMddHHmmss", CultureInfo.CurrentCulture, DateTimeStyles.AssumeUniversal, out DateTimeOffset parsedDateTime))
+                {
+                    return parsedDateTime;
+                }
+            }
+            else
+            {
+                var standardDate = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "{0} {1}",
+                    dateComponent,
+                    dateOffset);
+                if (DateTimeOffset.TryParseExact(standardDate, "yyyyMMddHHmmss zzz", CultureInfo.CurrentCulture, DateTimeStyles.AssumeUniversal, out DateTimeOffset parsedDateTime))
+                {
+                    return parsedDateTime;
+                }
             }
 
             return null;
@@ -1063,7 +1072,7 @@ namespace Jellyfin.XmlTv
 
         public string StandardiseDate(string value)
         {
-            var completeDate = "20000101000000";
+            const string CompleteDate = "20000101000000";
             var dateComponent = string.Empty;
             var dateOffset = "+0000";
 
@@ -1077,7 +1086,7 @@ namespace Jellyfin.XmlTv
             // Pad out the date component part to 14 characaters so 2016061509 becomes 20160615090000
             if (dateComponent.Length < 14)
             {
-                dateComponent = dateComponent + completeDate.Substring(dateComponent.Length, completeDate.Length - dateComponent.Length);
+                dateComponent += CompleteDate[dateComponent.Length..];
             }
 
             return string.Format(
