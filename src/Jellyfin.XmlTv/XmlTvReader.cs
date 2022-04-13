@@ -934,7 +934,7 @@ namespace Jellyfin.XmlTv
              */
 
             var currentElementName = reader.Name;
-            var values = new List<(string? language, string value)>();
+            var values = new List<(string? Language, string Value)>();
 
             while (!reader.EOF && reader.ReadState == ReadState.Interactive)
             {
@@ -955,9 +955,9 @@ namespace Jellyfin.XmlTv
                 }
             }
 
-            if (values.Any(v => v.language == languageRequired))
+            if (values.Any(v => v.Language == languageRequired))
             {
-                values.RemoveAll(v => v.language != languageRequired);
+                values.RemoveAll(v => v.Language != languageRequired);
             }
 
             // Enumerate and return all the matches
