@@ -81,7 +81,7 @@ namespace Jellyfin.XmlTv.Tests
             Assert.Equal("Cameras follow the youngsters' development after two weeks apart and time has made the heart grow fonder for Alfie and Emily, who are clearly happy to be back together. And although Alfie struggled to empathise with the rest of his peers before, a painting competition proves to be a turning point for him. George takes the children's rejection of his family recipe to heart, but goes on to triumph elsewhere, and romance is in the air when newcomer Sienna captures Arthur's heart.", programme.Description);
             Assert.Equal("Documentary", programme.Categories.Single());
             Assert.NotNull(programme.Episode);
-            Assert.Equal("The Secret Life of 5 Year Olds", programme.Episode.Title);
+            Assert.Equal("The Secret Life of 5 Year Olds", programme.Episode!.Title);
             Assert.Equal(1, programme.Episode.Series);
             Assert.Null(programme.Episode.SeriesCount);
             Assert.Equal(4, programme.Episode.Episode);
@@ -177,14 +177,7 @@ namespace Jellyfin.XmlTv.Tests
             Assert.Equal(2, programme.Categories.Count);
             Assert.Equal("Documentales", programme.Categories[0]);
             Assert.Equal("Sociedad", programme.Categories[1]);
-            Assert.NotNull(programme.Episode);
-            Assert.Null(programme.Episode.Episode);
-            Assert.Null(programme.Episode.EpisodeCount);
-            Assert.Null(programme.Episode.Part);
-            Assert.Null(programme.Episode.PartCount);
-            Assert.Null(programme.Episode.Series);
-            Assert.Null(programme.Episode.SeriesCount);
-            Assert.Null(programme.Episode.Title);
+            Assert.Null(programme.Episode);
         }
 
         [Fact]

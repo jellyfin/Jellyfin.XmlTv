@@ -127,7 +127,7 @@ namespace Jellyfin.XmlTv
         private void SetChannelNumber(XmlTvChannel channel, string value)
         {
             value = value.Replace('-', '.');
-            if (double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var number))
+            if (double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var _))
             {
                 channel.Number = value;
             }
@@ -463,6 +463,8 @@ namespace Jellyfin.XmlTv
 
         public void ProcessEpisodeNum(XmlReader reader, XmlTvProgram result)
         {
+            result.Episode ??= new XmlTvEpisode();
+
             /*
             <episode-num system="dd_progid">EP00003026.0666</episode-num>
             <episode-num system="onscreen">2706</episode-num>
@@ -515,12 +517,12 @@ namespace Jellyfin.XmlTv
 
                 if (int.TryParse(res.Groups[1].Value, out parsedInt))
                 {
-                    result.Episode.Series = parsedInt;
+                    result.Episode!.Series = parsedInt;
                 }
 
                 if (int.TryParse(res.Groups[2].Value, out parsedInt))
                 {
-                    result.Episode.Episode = parsedInt;
+                    result.Episode!.Episode = parsedInt;
                 }
             }
         }
@@ -643,7 +645,7 @@ namespace Jellyfin.XmlTv
                 // handle the zero basing!
                 if (int.TryParse(seriesComponents[0], out parsedInt))
                 {
-                    result.Episode.Series = parsedInt + 1;
+                    result.Episode!.Series = parsedInt + 1;
                     if (seriesComponents.Length == 2
                         && int.TryParse(seriesComponents[1], out parsedInt))
                     {
@@ -662,7 +664,7 @@ namespace Jellyfin.XmlTv
                     // handle the zero basing!
                     if (int.TryParse(episodeComponents[0], out parsedInt))
                     {
-                        result.Episode.Episode = parsedInt + 1;
+                        result.Episode!.Episode = parsedInt + 1;
                         if (episodeComponents.Length == 2
                             && int.TryParse(episodeComponents[1], out parsedInt))
                         {
@@ -682,7 +684,7 @@ namespace Jellyfin.XmlTv
                     // handle the zero basing!
                     if (int.TryParse(partComponents[0], out parsedInt))
                     {
-                        result.Episode.Part = parsedInt + 1;
+                        result.Episode!.Part = parsedInt + 1;
                         if (partComponents.Length == 2
                             && int.TryParse(partComponents[1], out parsedInt))
                         {
@@ -748,6 +750,8 @@ namespace Jellyfin.XmlTv
 
         public void ProcessSubTitle(XmlReader reader, XmlTvProgram result)
         {
+            result.Episode ??= new XmlTvEpisode();
+
             /*
             <sub-title lang="en">Gino&apos;s Italian Escape - Islands in the Sun: Southern Sardinia Celebrate the Sea</sub-title>
             <sub-title lang="en">8782</sub-title>
