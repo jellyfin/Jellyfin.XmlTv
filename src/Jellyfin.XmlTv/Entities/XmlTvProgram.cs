@@ -15,7 +15,7 @@ namespace Jellyfin.XmlTv.Entities
             Credits = new List<XmlTvCredit>();
             Categories = new List<string>();
             Countries = new List<string>();
-            Episode = new XmlTvEpisode();
+            Episode = null;
 
             ProviderIds = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             SeriesProviderIds = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -47,7 +47,7 @@ namespace Jellyfin.XmlTv.Entities
 
         public DateTimeOffset? CopyrightDate { get; set; }
 
-        public XmlTvEpisode Episode { get; set; }
+        public XmlTvEpisode? Episode { get; set; }
 
         public List<XmlTvCredit> Credits { get; }
 

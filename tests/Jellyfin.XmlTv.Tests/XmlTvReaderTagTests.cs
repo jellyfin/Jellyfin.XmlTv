@@ -67,22 +67,40 @@ public class XmlTvReaderTagTests
             },
         };
 
-        [Theory]
-        [MemberData(nameof(GetProgramme_ProcessCategory_SelectsCorrectCategories_TestData))]
-        public void GetProgramme_ProcessCategory_SelectsCorrectCategories(string categoryInput, string? language, string[] expected)
-        {
-            var channel = "channel";
-            var inputString = String.Format(CultureInfo.InvariantCulture, ProgrammeFormat, channel, categoryInput);
+    [Theory]
+    [MemberData(nameof(GetProgramme_ProcessCategory_SelectsCorrectCategories_TestData))]
+    public void GetProgramme_ProcessCategory_SelectsCorrectCategories(string categoryInput, string? language, string[] expected)
+    {
+        var channel = "channel";
+        var inputString = String.Format(CultureInfo.InvariantCulture, ProgrammeFormat, channel, categoryInput);
 
-            var xmlTvReader = new XmlTvReader("file", language);
-            using var reader = XmlReader.Create(new StringReader(inputString));
-            reader.ReadToNextElement();
+        var xmlTvReader = new XmlTvReader("file", language);
+        using var reader = XmlReader.Create(new StringReader(inputString));
+        reader.ReadToNextElement();
 
-            var result = xmlTvReader.GetProgramme(reader, channel, DateTimeOffset.MinValue, DateTimeOffset.MaxValue);
+        var result = xmlTvReader.GetProgramme(reader, channel, DateTimeOffset.MinValue, DateTimeOffset.MaxValue);
 
-            Assert.NotNull(result);
-            Assert.Equal(expected, result!.Categories);
-        }
+        Assert.NotNull(result);
+        Assert.Equal(expected, result!.Categories);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("<category>Thriller</category>")]
+    public void GetProgramme_NoEpisodeTags_NullEpisode(string input)
+    {
+        var channel = "channel";
+        var inputString = String.Format(CultureInfo.InvariantCulture, ProgrammeFormat, channel, input);
+
+        var xmlTvReader = new XmlTvReader("file");
+        using var reader = XmlReader.Create(new StringReader(inputString));
+        reader.ReadToNextElement();
+
+        var result = xmlTvReader.GetProgramme(reader, channel, DateTimeOffset.MinValue, DateTimeOffset.MaxValue);
+
+        Assert.NotNull(result);
+        Assert.Null(result!.Episode);
+    }
 
     [Theory]
     [InlineData("", null, null)]
@@ -100,7 +118,8 @@ public class XmlTvReaderTagTests
         var result = xmlTvReader.GetProgramme(reader, channel, DateTimeOffset.MinValue, DateTimeOffset.MaxValue);
 
         Assert.NotNull(result);
-        Assert.Equal(series, result!.Episode.Series);
+        Assert.NotNull(result!.Episode);
+        Assert.Equal(series, result.Episode!.Series);
         Assert.Equal(episode, result.Episode.Episode);
     }
 
@@ -126,7 +145,8 @@ public class XmlTvReaderTagTests
         var result = xmlTvReader.GetProgramme(reader, channel, DateTimeOffset.MinValue, DateTimeOffset.MaxValue);
 
         Assert.NotNull(result);
-        Assert.Equal(series, result!.Episode.Series);
+        Assert.NotNull(result!.Episode);
+        Assert.Equal(series, result.Episode!.Series);
         Assert.Equal(seriesCount, result.Episode.SeriesCount);
         Assert.Equal(episode, result.Episode.Episode);
         Assert.Equal(episodeCount, result.Episode.EpisodeCount);
@@ -151,12 +171,12 @@ public class XmlTvReaderTagTests
 
         // last one parsed overrides
         Assert.NotNull(result);
-        Assert.Equal(2, result!.Episode.Series);
+        Assert.NotNull(result!.Episode);
+        Assert.Equal(2, result.Episode!.Series);
         Assert.Equal(4, result.Episode.Episode);
     }
 
     [Theory]
-    [InlineData("", null, null)]
     [InlineData("<sub-title>Episode Title</sub-title>", null, "Episode Title")]
     [InlineData("<sub-title lang=\"\">Episode Title</sub-title>", null, "Episode Title")]
     [InlineData("<sub-title lang=\"en\">english</sub-title><sub-title lang=\"es\">spanish</sub-title>", null, "english")]
@@ -175,6 +195,7 @@ public class XmlTvReaderTagTests
         var result = xmlTvReader.GetProgramme(reader, channel, DateTimeOffset.MinValue, DateTimeOffset.MaxValue);
 
         Assert.NotNull(result);
-        Assert.Equal(expected, result!.Episode.Title);
+        Assert.NotNull(result!.Episode);
+        Assert.Equal(expected, result.Episode!.Title);
     }
 }
