@@ -14,7 +14,8 @@ namespace Jellyfin.XmlTv
     // Reads an XmlTv file
     public class XmlTvReader
     {
-        private const string DateWithOffsetRegex = @"^(?<dateDigits>[0-9]{4,14})(\s(?<dateOffset>[+-]*[0-9]{1,4}))?$";
+        private const string DateWithOffsetRegex = @"^(?<dateDigits>[0-9]{4,14})(\s(?<dateOffset>[+-]*[0-9:]{1,5}))?$";
+        // private const string DateWithOffsetRegex = @"^(?<dateDigits>[0-9]{4,14})(\s(?<dateOffset>[+-]*[0-9]{1,4}))?$";
 
         private readonly string _fileName;
         private readonly string? _language;
@@ -1040,6 +1041,10 @@ namespace Jellyfin.XmlTv
                     if (tmpDateOffset.Length == 5)
                     {
                         dateOffset = tmpDateOffset.Insert(3, ":"); // Add in the colon to ease parsing later
+                    }
+                    else if (tmpDateOffset.Length == 6 && tmpDateOffset.Contains(':', StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        dateOffset = tmpDateOffset;
                     }
                 }
             }
