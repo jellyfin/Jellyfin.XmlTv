@@ -48,6 +48,8 @@ namespace Jellyfin.XmlTv.Tests
         [InlineData(" ")]
         [InlineData("a")]
         [InlineData("1")]
+        [InlineData("20160101120000 +10:::")]
+
         public void ParseDate_Invalid_Null(string value)
         {
             Assert.Null(XmlTvReader.ParseDate(value));
