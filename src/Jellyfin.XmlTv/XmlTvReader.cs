@@ -222,6 +222,9 @@ namespace Jellyfin.XmlTv
                             case "new":
                                 ProcessNew(xmlProg, result);
                                 break;
+                            case "live":
+                                ProcessLive(xmlProg, result);
+                                break;
                             case "previously-shown":
                                 ProcessPreviouslyShown(xmlProg, result);
                                 break;
@@ -724,6 +727,12 @@ namespace Jellyfin.XmlTv
         public void ProcessNew(XmlReader reader, XmlTvProgram result)
         {
             result.IsNew = true;
+            reader.Skip(); // Move on
+        }
+
+        public void ProcessLive(XmlReader reader, XmlTvProgram result)
+        {
+            result.IsLive = true;
             reader.Skip(); // Move on
         }
 
