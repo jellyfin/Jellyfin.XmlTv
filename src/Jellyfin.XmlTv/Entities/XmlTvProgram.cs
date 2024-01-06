@@ -45,6 +45,8 @@ namespace Jellyfin.XmlTv.Entities
 
         public bool IsNew { get; set; }
 
+        public bool IsLive { get; set; }
+
         public DateTimeOffset? CopyrightDate { get; set; }
 
         public XmlTvEpisode? Episode { get; set; }
