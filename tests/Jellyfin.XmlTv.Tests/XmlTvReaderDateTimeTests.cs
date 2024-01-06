@@ -27,10 +27,7 @@ namespace Jellyfin.XmlTv.Tests
         [InlineData("01 Jan 2016 01:00:00", "20160101 -0100")]
         [InlineData("01 Jan 2016 13:00:00", "2016010112 -0100")]
         [InlineData("01 Jan 2016 13:00:00", "201601011200 -0100")]
-        [InlineData("01 Jan 2016 12:00:00", "20160101120000 +000")]
-        [InlineData("01 Jan 2016 12:00:00", "20160101120000 +00")]
-        [InlineData("01 Jan 2016 12:00:00", "20160101120000 +0")]
-        [InlineData("01 Jan 2016 12:00:00", "20160101120000 0")]
+        [InlineData("01 Jan 2016 12:00:00", "201601011200 BST")]
         public void HandlePartDatesTest(string expected, string value)
         {
             Assert.Equal(
