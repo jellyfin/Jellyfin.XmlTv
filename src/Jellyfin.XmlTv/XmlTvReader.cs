@@ -318,11 +318,7 @@ namespace Jellyfin.XmlTv
                         var language = reader.GetAttribute("lang");
                         if (!string.IsNullOrEmpty(language))
                         {
-                            if (!results.ContainsKey(language))
-                            {
-                                results[language] = 0;
-                            }
-
+                            results.TryAdd(language, 0);
                             results[language]++;
                         }
                     }
@@ -536,7 +532,7 @@ namespace Jellyfin.XmlTv
             // <episode-num system="thetvdb.com">episode/4749206</episode-num>
 
             var value = reader.ReadElementContentAsString();
-            var parts = value.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            var parts = value.Split('/', StringSplitOptions.RemoveEmptyEntries);
 
             if (string.Equals(parts[0], "series", StringComparison.OrdinalIgnoreCase))
             {
@@ -560,7 +556,7 @@ namespace Jellyfin.XmlTv
                 return;
             }
 
-            var parts = value.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            var parts = value.Split('/', StringSplitOptions.RemoveEmptyEntries);
 
             if (parts.Length != 2)
             {
@@ -583,7 +579,7 @@ namespace Jellyfin.XmlTv
             // <episode-num system="thetvdb.com">episode/4749206</episode-num>
 
             var value = reader.ReadElementContentAsString();
-            var parts = value.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            var parts = value.Split('/', StringSplitOptions.RemoveEmptyEntries);
 
             if (parts.Length != 2)
             {
