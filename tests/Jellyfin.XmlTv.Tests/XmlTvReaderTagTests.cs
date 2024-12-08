@@ -12,7 +12,7 @@ public class XmlTvReaderTagTests
     private const string ProgrammeFormat = "<programme start=\"20220328040000 +0000\" stop=\"20220328050000 +0000\" channel=\"{0}\">{1}</programme>";
     private const string EpisodeNumFormat = "<episode-num system=\"{0}\">{1}</episode-num>";
 
-    private static TheoryData<string, string?, string[]> GetProgramme_ProcessCategory_SelectsCorrectCategories_TestData()
+    public static TheoryData<string, string?, string[]> GetProgramme_ProcessCategory_SelectsCorrectCategories_TestData()
         => new()
         {
             {
