@@ -14,7 +14,23 @@ namespace Jellyfin.XmlTv
     // Reads an XmlTv file
     public class XmlTvReader
     {
-        private const string DateWithOffsetRegex = @"^(?<dateDigits>[0-9]{4,14})(\s(?<dateOffset>[+-]*[0-9]{1,4}))?$";
+        private static readonly string[] _dateFormats =
+        {
+            "yyyyMMddHHmmss zzzz",
+            "yyyyMMddHHmmss",
+            "yyyyMMdd",
+            "yyyy",
+            "yyyyMM",
+            "yyyyMMddHH",
+            "yyyyMMddHHmm",
+            "yyyyMMddHHmmss",
+            "yyyyMMddHH zzzz",
+            "yyyyMMddHHmm zzzz",
+            "yyyyMMddHHmmss zzzz",
+            "yyyy zzzz",
+            "yyyyMM zzzz",
+            "yyyyMMdd zzzz",
+        };
 
         private readonly string _fileName;
         private readonly string? _language;
@@ -184,13 +200,25 @@ namespace Jellyfin.XmlTv
                 return null;
             }
 
-            var result = new XmlTvProgram(id);
-
-            PopulateHeader(reader, result);
-            if (result.EndDate < startDateUtc || result.StartDate >= endDateUtc)
+            var startValue = reader.GetAttribute("start");
+            var startDate = string.IsNullOrEmpty(startValue) ? DateTimeOffset.MinValue : ParseDate(startValue).GetValueOrDefault();
+            if (startDate >= endDateUtc)
             {
                 return null;
             }
+
+            var endValue = reader.GetAttribute("stop");
+            var endDate = string.IsNullOrEmpty(endValue) ? DateTimeOffset.MinValue : ParseDate(endValue).GetValueOrDefault();
+            if (endDate < startDateUtc)
+            {
+                return null;
+            }
+
+            var result = new XmlTvProgram(id)
+            {
+                StartDate = startDate,
+                EndDate = endDate
+            };
 
             using (var xmlProg = reader.ReadSubtree())
             {
@@ -508,13 +536,11 @@ namespace Jellyfin.XmlTv
             // <episode-num system="SxxExx">S012E32</episode-num>
 
             var value = reader.ReadElementContentAsString();
-            var res = Regex.Match(value, "s([0-9]+)e([0-9]+)", RegexOptions.IgnoreCase);
+            var res = Regex.Match(value, "s([0-9]+)e([0-9]+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
             if (res.Success)
             {
-                int parsedInt;
-
-                if (int.TryParse(res.Groups[1].Value, out parsedInt))
+                if (int.TryParse(res.Groups[1].Value, out var parsedInt))
                 {
                     result.Episode!.Series = parsedInt;
                 }
@@ -993,29 +1019,6 @@ namespace Jellyfin.XmlTv
             }
         }
 
-        private void PopulateHeader(XmlReader reader, XmlTvProgram result)
-        {
-            var startValue = reader.GetAttribute("start");
-            if (string.IsNullOrEmpty(startValue))
-            {
-                result.StartDate = DateTimeOffset.MinValue;
-            }
-            else
-            {
-                result.StartDate = ParseDate(startValue).GetValueOrDefault();
-            }
-
-            var endValue = reader.GetAttribute("stop");
-            if (string.IsNullOrEmpty(endValue))
-            {
-                result.EndDate = DateTimeOffset.MinValue;
-            }
-            else
-            {
-                result.EndDate = ParseDate(endValue).GetValueOrDefault();
-            }
-        }
-
         public static DateTimeOffset? ParseDate(string dateValue)
         {
             /*
@@ -1032,80 +1035,24 @@ namespace Jellyfin.XmlTv
                 return null;
             }
 
-            const string CompleteDate = "20000101000000";
-            var dateComponent = string.Empty;
-            string? dateOffset = null;
-            var match = Regex.Match(dateValue, DateWithOffsetRegex);
-            if (match.Success)
+            var dateSpan = dateValue.AsSpan().Trim();
+            // Remove timezone identifier (but we really should try to support it)
+            var lastSpace = dateSpan.LastIndexOf(' ');
+            if (lastSpace != -1)
             {
-                dateComponent = match.Groups["dateDigits"].Value;
-                if (!string.IsNullOrEmpty(match.Groups["dateOffset"].Value))
+                var firstCharAfterSpace = dateSpan[lastSpace + 1];
+                if (firstCharAfterSpace != '+' && firstCharAfterSpace != '-')
                 {
-                    var tmpDateOffset = match.Groups["dateOffset"].Value; // Add in the colon to ease parsing later
-                    if (tmpDateOffset.Length == 5)
-                    {
-                        dateOffset = tmpDateOffset.Insert(3, ":"); // Add in the colon to ease parsing later
-                    }
+                    dateSpan = dateSpan[..lastSpace];
                 }
-            }
-            else
-            {
-                return null;
             }
 
-            // Pad out the date component part to 14 characaters so 2016061509 becomes 20160615090000
-            if (dateComponent.Length < 14)
+            if (DateTimeOffset.TryParseExact(dateSpan, _dateFormats, CultureInfo.CurrentCulture, DateTimeStyles.AssumeUniversal, out var date))
             {
-                dateComponent += CompleteDate[dateComponent.Length..];
-            }
-
-            if (dateOffset == null)
-            {
-                if (DateTimeOffset.TryParseExact(dateComponent, "yyyyMMddHHmmss", CultureInfo.CurrentCulture, DateTimeStyles.AssumeUniversal, out DateTimeOffset parsedDateTime))
-                {
-                    return parsedDateTime;
-                }
-            }
-            else
-            {
-                var standardDate = string.Format(
-                    CultureInfo.InvariantCulture,
-                    "{0} {1}",
-                    dateComponent,
-                    dateOffset);
-                if (DateTimeOffset.TryParseExact(standardDate, "yyyyMMddHHmmss zzz", CultureInfo.CurrentCulture, DateTimeStyles.AssumeUniversal, out DateTimeOffset parsedDateTime))
-                {
-                    return parsedDateTime;
-                }
+                return date;
             }
 
             return null;
-        }
-
-        public string StandardiseDate(string value)
-        {
-            const string CompleteDate = "20000101000000";
-            var dateComponent = string.Empty;
-            var dateOffset = "+0000";
-
-            var match = Regex.Match(value, DateWithOffsetRegex);
-            if (match.Success)
-            {
-                dateComponent = match.Groups["dateDigits"].Value;
-                dateOffset = match.Groups["dateOffset"].Value;
-            }
-
-            // Pad out the date component part to 14 characaters so 2016061509 becomes 20160615090000
-            if (dateComponent.Length < 14)
-            {
-                dateComponent += CompleteDate[dateComponent.Length..];
-            }
-
-            return string.Format(
-                CultureInfo.InvariantCulture,
-                "{0} {1}",
-                dateComponent,
-                dateOffset);
         }
     }
 }
