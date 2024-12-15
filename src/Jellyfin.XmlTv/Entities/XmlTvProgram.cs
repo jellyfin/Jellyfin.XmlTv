@@ -1,4 +1,6 @@
-#pragma warning disable CS1591, CA1002
+#pragma warning disable CA1002 // Do not expose generic lists
+#pragma warning disable CA2227 // Collection properties should be read only
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 using System;
 using System.Collections.Generic;
@@ -12,9 +14,9 @@ namespace Jellyfin.XmlTv.Entities
         public XmlTvProgram(string channelId)
         {
             ChannelId = channelId;
-            Credits = new List<XmlTvCredit>();
-            Categories = new List<string>();
-            Countries = new List<string>();
+            Credits = [];
+            Categories = [];
+            Countries = [];
             Episode = null;
 
             ProviderIds = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -59,6 +61,8 @@ namespace Jellyfin.XmlTv.Entities
 
         public XmlTvIcon? Icon { get; set; }
 
+        public List<XmlTvImage>? Images { get; set; }
+
         public XmlTvPremiere? Premiere { get; set; }
 
         public Dictionary<string, string> ProviderIds { get; }
@@ -75,7 +79,7 @@ namespace Jellyfin.XmlTv.Entities
             }
 
             // If the other is null then return false
-            if (other == null)
+            if (other is null)
             {
                 return false;
             }

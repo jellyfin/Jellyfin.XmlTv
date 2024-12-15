@@ -32,7 +32,7 @@ namespace Jellyfin.XmlTv.Entities
             }
 
             // If the other is null then return false
-            if (other == null)
+            if (other is null)
             {
                 return false;
             }

@@ -219,5 +219,31 @@ namespace Jellyfin.XmlTv.Tests
             Assert.NotNull(programme.Icon);
             Assert.True(programme!.Icon!.Width > programme.Icon.Height);
         }
+
+        [Fact]
+        public void BasicTest()
+        {
+            var testFile = Path.Join("Test Data", "custom.xml");
+            var reader = new XmlTvReader(testFile, null);
+
+            var channels = reader.GetChannels().ToList();
+
+            // Pick a channel to check the data for
+            var channel = channels.SingleOrDefault(c => c.Id == "EPG123.10108.schedulesdirect.org"); // CTV Toronto
+            Assert.NotNull(channel);
+
+            var startDate = new DateTimeOffset(2020, 07, 29, 0, 0, 0, new TimeSpan());
+            var programmes = reader.GetProgrammes(channel!.Id, startDate, startDate.AddDays(1)).ToList();
+
+            var programme = programmes.SingleOrDefault(p => p.Title == "Unforgettable");
+            Assert.True(programme?.Images?.Count == 4);
+            var credits = programme.Credits;
+            Assert.True(credits.Count == 30);
+            Assert.True(credits[5]?.Images?.Count == 1);
+            Assert.True(credits[5]?.Urls?.Count == 1);
+
+            Assert.NotNull(programme.Icon);
+            Assert.True(programme!.Icon!.Width > programme.Icon.Height);
+        }
     }
 }

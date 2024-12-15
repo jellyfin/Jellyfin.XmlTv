@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml;
 using Jellyfin.XmlTv.Entities;
+using Jellyfin.XmlTv.Enums;
 
 namespace Jellyfin.XmlTv
 {
@@ -59,7 +60,7 @@ namespace Jellyfin.XmlTv
                     do
                     {
                         var channel = GetChannel(reader);
-                        if (channel != null)
+                        if (channel is not null)
                         {
                             list.Add(channel);
                         }
@@ -162,7 +163,7 @@ namespace Jellyfin.XmlTv
                         }
 
                         var programme = GetProgramme(reader, channelId, startDateUtc, endDateUtc);
-                        if (programme != null)
+                        if (programme is not null)
                         {
                             list.Add(programme);
                         }
@@ -179,7 +180,7 @@ namespace Jellyfin.XmlTv
             var id = reader.GetAttribute("channel");
 
             // First up, validate that this is the correct channel, and programme is within the time we are expecting
-            if (id == null || !string.Equals(id, channelId, StringComparison.OrdinalIgnoreCase))
+            if (id is null || !string.Equals(id, channelId, StringComparison.OrdinalIgnoreCase))
             {
                 return null;
             }
@@ -250,26 +251,38 @@ namespace Jellyfin.XmlTv
                                 }
                                 else
                                 {
-                                    using (var subtree = xmlProg.ReadSubtree())
-                                    {
-                                        ProcessCredits(subtree, result);
-                                    }
+                                    using var subtree = xmlProg.ReadSubtree();
+                                    ProcessCredits(subtree, result);
                                 }
 
                                 break;
                             case "icon":
                                 XmlTvIcon? icon = ProcessIconNode(xmlProg);
-                                if (result.Icon == null)
+                                if (result.Icon is null)
                                 {
                                     result.Icon = icon; // If there is no icon set then set the processed icon (which could also be null)
                                 }
                                 else
                                 {
                                     // If there is already an icon set (which could be a poster) then replace it with a banner
-                                    if (icon != null && icon.Width.GetValueOrDefault() > icon.Height.GetValueOrDefault())
+                                    if (icon is not null && icon.Width.GetValueOrDefault() > icon.Height.GetValueOrDefault())
                                     {
                                         result.Icon = icon;
                                     }
+                                }
+
+                                xmlProg.Skip();
+
+                                break;
+                            case "image":
+                                XmlTvImage? image = ProcessImageNode(xmlProg);
+                                if (result.Images is null)
+                                {
+                                    result.Images = [image];
+                                }
+                                else
+                                {
+                                    result.Images.Add(image);
                                 }
 
                                 xmlProg.Skip();
@@ -340,7 +353,7 @@ namespace Jellyfin.XmlTv
             else
             {
                 var copyrightDate = ParseDate(startValue);
-                if (copyrightDate != null)
+                if (copyrightDate is not null)
                 {
                     result.CopyrightDate = copyrightDate;
                 }
@@ -357,44 +370,88 @@ namespace Jellyfin.XmlTv
             {
                 if (creditsXml.NodeType == XmlNodeType.Element)
                 {
-                    XmlTvCredit? credit = null;
-                    switch (creditsXml.Name)
+                    var type = creditsXml.Name switch
                     {
-                        case "director":
-                            credit = new XmlTvCredit(XmlTvCreditType.Director, creditsXml.ReadElementContentAsString());
-                            break;
-                        case "actor":
-                            credit = new XmlTvCredit(XmlTvCreditType.Actor, creditsXml.ReadElementContentAsString());
-                            break;
-                        case "writer":
-                            credit = new XmlTvCredit(XmlTvCreditType.Writer, creditsXml.ReadElementContentAsString());
-                            break;
-                        case "adapter":
-                            credit = new XmlTvCredit(XmlTvCreditType.Adapter, creditsXml.ReadElementContentAsString());
-                            break;
-                        case "producer":
-                            credit = new XmlTvCredit(XmlTvCreditType.Producer, creditsXml.ReadElementContentAsString());
-                            break;
-                        case "composer":
-                            credit = new XmlTvCredit(XmlTvCreditType.Composer, creditsXml.ReadElementContentAsString());
-                            break;
-                        case "editor":
-                            credit = new XmlTvCredit(XmlTvCreditType.Editor, creditsXml.ReadElementContentAsString());
-                            break;
-                        case "presenter":
-                            credit = new XmlTvCredit(XmlTvCreditType.Presenter, creditsXml.ReadElementContentAsString());
-                            break;
-                        case "commentator":
-                            credit = new XmlTvCredit(XmlTvCreditType.Commentator, creditsXml.ReadElementContentAsString());
-                            break;
-                        case "guest":
-                            credit = new XmlTvCredit(XmlTvCreditType.Guest, creditsXml.ReadElementContentAsString());
-                            break;
-                    }
+                        "director" => CreditType.Director,
+                        "actor" => CreditType.Actor,
+                        "writer" => CreditType.Writer,
+                        "adapter" => CreditType.Adapter,
+                        "producer" => CreditType.Producer,
+                        "composer" => CreditType.Composer,
+                        "editor" => CreditType.Editor,
+                        "presenter" => CreditType.Presenter,
+                        "commentator" => CreditType.Commentator,
+                        "guest" => CreditType.Guest,
+                        _ => CreditType.NotSpecified
+                    };
 
-                    if (credit != null)
+                    if (type is not CreditType.NotSpecified)
                     {
-                        result.Credits.Add(credit);
+                        var credit = new XmlTvCredit(type)
+                        {
+                            // Role
+                            Role = creditsXml.GetAttribute("role")
+                        };
+
+                        // Guest status
+                        var guestAttributeString = creditsXml.GetAttribute("guest");
+                        credit.Guest = string.Equals(guestAttributeString, "yes", StringComparison.OrdinalIgnoreCase);
+
+                        // Name
+                        // credit.Name = creditsXml.ReadElementContentAsString();
+
+                        // Loop through each element
+                        var images = new List<XmlTvImage>();
+                        var urls = new List<XmlTvUrl>();
+
+                        using var creditXml = creditsXml.ReadSubtree();
+                        creditXml.MoveToContent();
+                        creditXml.Read();
+                        while (!creditXml.EOF && creditXml.ReadState == ReadState.Interactive)
+                        {
+                            if (creditXml.NodeType == XmlNodeType.Text)
+                            {
+                                // Name
+                                credit.Name = creditXml.ReadContentAsString().Trim();
+                            }
+                            else if (creditXml.NodeType == XmlNodeType.Element)
+                            {
+                                var nodeName = creditXml.Name;
+                                if (string.Equals(nodeName, "image", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    // Image
+                                    var image = ProcessImageNode(creditXml);
+                                    if (image is not null)
+                                    {
+                                        images.Add(image);
+                                    }
+                                }
+                                else if (string.Equals(nodeName, "url", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    // URL
+                                    var url = ProcessUrlNode(creditXml);
+                                    if (url is not null)
+                                    {
+                                        urls.Add(url);
+                                    }
+                                }
+                                else
+                                {
+                                    creditXml.Skip();
+                                }
+                            }
+                            else
+                            {
+                                creditXml.Skip();
+                            }
+                        }
+
+                        if (credit is not null)
+                        {
+                            credit.Images = images.Count == 0 ? null : images;
+                            credit.Urls = urls.Count == 0 ? null : urls;
+                            result.Credits.Add(credit);
+                        }
                     }
                     else
                     {
@@ -738,7 +795,7 @@ namespace Jellyfin.XmlTv
             <category lang="en">News</category>
             */
 
-            ProcessMultipleNodes(reader, s => result.Categories.Add(s), _language);
+            ProcessMultipleNodes(reader, result.Categories.Add, _language);
 
             // result.Categories.Add(reader.ReadElementContentAsString());
         }
@@ -750,7 +807,7 @@ namespace Jellyfin.XmlTv
             <country>EE.UU</country>
             */
 
-            ProcessNode(reader, s => result.Countries.Add(s), _language);
+            ProcessNode(reader, result.Countries.Add, _language);
         }
 
         public void ProcessSubTitle(XmlReader reader, XmlTvProgram result)
@@ -814,6 +871,65 @@ namespace Jellyfin.XmlTv
             }
 
             return isPopulated ? result : null;
+        }
+
+        public XmlTvImage ProcessImageNode(XmlReader reader)
+        {
+            var result = new XmlTvImage();
+
+            var typeString = reader.GetAttribute("type");
+            if (!string.IsNullOrEmpty(typeString) && Enum.TryParse<ImageType>(typeString, true, out var parsedType))
+            {
+                result.Type = parsedType;
+            }
+
+            var sizeString = reader.GetAttribute("size");
+            if (!string.IsNullOrEmpty(sizeString) && Enum.TryParse<ImageSize>(sizeString, true, out var parsedSize))
+            {
+                result.Size = parsedSize;
+            }
+
+            var orientationString = reader.GetAttribute("orient");
+            if (!string.IsNullOrEmpty(orientationString) && Enum.TryParse<ImageOrientation>(orientationString, true, out var parsedOrientation))
+            {
+                result.Orientation = parsedOrientation;
+            }
+
+            var systemString = reader.GetAttribute("system");
+            result.System = GetSystem(systemString);
+
+            result.Path = reader.ReadElementContentAsString();
+
+            return result;
+        }
+
+        public XmlTvUrl ProcessUrlNode(XmlReader reader)
+        {
+            var result = new XmlTvUrl();
+
+            var systemString = reader.GetAttribute("system");
+            result.System = GetSystem(systemString);
+
+            result.Uri = reader.ReadElementContentAsString();
+
+            return result;
+        }
+
+        public string? GetSystem(string? systemString)
+        {
+            return systemString switch
+            {
+                "tmdb" => "tmdb",
+                "themoviedb" => "tmdb",
+                "themoviedb.org" => "tmdb",
+                "moviedb" => "tmdb",
+                "tvdb" => "tvdb",
+                "thetvdb" => "tvdb",
+                "thetvdb.com" => "tvdb",
+                "imdb" => "imdb",
+                "imdb.com" => "imdb",
+                _ => null
+            };
         }
 
         public void ProcessNodeWithLanguage(XmlReader reader, Action<string> setter)
@@ -1059,7 +1175,7 @@ namespace Jellyfin.XmlTv
                 dateComponent += CompleteDate[dateComponent.Length..];
             }
 
-            if (dateOffset == null)
+            if (dateOffset is null)
             {
                 if (DateTimeOffset.TryParseExact(dateComponent, "yyyyMMddHHmmss", CultureInfo.CurrentCulture, DateTimeStyles.AssumeUniversal, out DateTimeOffset parsedDateTime))
                 {
