@@ -1,13 +1,17 @@
+#pragma warning disable CA1002 // Do not expose generic lists
+#pragma warning disable CA2227 // Collection properties should be read only
+
 using System.Collections.Generic;
 using System.Globalization;
 using Jellyfin.XmlTv.Enums;
+using Jellyfin.XmlTv.Interfaces;
 
 namespace Jellyfin.XmlTv.Entities;
 
 /// <summary>
 /// Credit class.
 /// </summary>
-public class XmlTvCredit
+public class XmlTvCredit : IHasUrls, IHasImages
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="XmlTvCredit"/> class.
@@ -43,12 +47,12 @@ public class XmlTvCredit
     /// <summary>
     /// Gets or sets the images.
     /// </summary>
-    public IReadOnlyList<XmlTvImage>? Images { get; set; }
+    public List<XmlTvImage>? Images { get; set; }
 
     /// <summary>
     /// Gets or sets the urls.
     /// </summary>
-    public IReadOnlyList<XmlTvUrl>? Urls { get; set; }
+    public List<XmlTvUrl>? Urls { get; set; }
 
     /// <inheritdoc />
     public override string ToString()

@@ -9,14 +9,13 @@ using System.Threading;
 using System.Xml;
 using Jellyfin.XmlTv.Entities;
 using Jellyfin.XmlTv.Enums;
+using Jellyfin.XmlTv.Interfaces;
 
 namespace Jellyfin.XmlTv
 {
     // Reads an XmlTv file
-    public class XmlTvReader
+    public partial class XmlTvReader
     {
-        private const string DateWithOffsetRegex = @"^(?<dateDigits>[0-9]{4,14})(\s(?<dateOffset>[+-]*[0-9]{1,4}))?$";
-
         private readonly string _fileName;
         private readonly string? _language;
 
@@ -30,6 +29,9 @@ namespace Jellyfin.XmlTv
             _fileName = fileName;
             _language = language;
         }
+
+        [GeneratedRegex(@"^(?<dateDigits>[0-9]{4,14})(\s(?<dateOffset>[+-]*[0-9]{1,4}))?$")]
+        private static partial Regex DateWithOffsetRegex();
 
         private static XmlReader CreateXmlTextReader(string path)
         {
@@ -99,11 +101,14 @@ namespace Jellyfin.XmlTv
                                 ProcessNode(xmlChannel, s => result.DisplayName = s, _language, s => SetChannelNumber(result, s));
                                 break;
                             case "url":
-                                result.Url = xmlChannel.ReadElementContentAsString();
+                                ProcessUrlNode(xmlChannel, result);
+                                xmlChannel.Skip();
+
                                 break;
                             case "icon":
-                                result.Icon = ProcessIconNode(xmlChannel);
+                                ProcessIconNode(xmlChannel, result);
                                 xmlChannel.Skip();
+
                                 break;
                             default:
                                 xmlChannel.Skip(); // unknown, skip entire node
@@ -257,34 +262,17 @@ namespace Jellyfin.XmlTv
 
                                 break;
                             case "icon":
-                                XmlTvIcon? icon = ProcessIconNode(xmlProg);
-                                if (result.Icon is null)
-                                {
-                                    result.Icon = icon; // If there is no icon set then set the processed icon (which could also be null)
-                                }
-                                else
-                                {
-                                    // If there is already an icon set (which could be a poster) then replace it with a banner
-                                    if (icon is not null && icon.Width.GetValueOrDefault() > icon.Height.GetValueOrDefault())
-                                    {
-                                        result.Icon = icon;
-                                    }
-                                }
+                                ProcessIconNode(xmlProg, result);
+                                xmlProg.Skip();
 
+                                break;
+                            case "url":
+                                ProcessUrlNode(xmlProg, result);
                                 xmlProg.Skip();
 
                                 break;
                             case "image":
-                                XmlTvImage? image = ProcessImageNode(xmlProg);
-                                if (result.Images is null)
-                                {
-                                    result.Images = [image];
-                                }
-                                else
-                                {
-                                    result.Images.Add(image);
-                                }
-
+                                ProcessImageNode(xmlProg, result);
                                 xmlProg.Skip();
 
                                 break;
@@ -401,9 +389,6 @@ namespace Jellyfin.XmlTv
                         // credit.Name = creditsXml.ReadElementContentAsString();
 
                         // Loop through each element
-                        var images = new List<XmlTvImage>();
-                        var urls = new List<XmlTvUrl>();
-
                         using var creditXml = creditsXml.ReadSubtree();
                         creditXml.MoveToContent();
                         creditXml.Read();
@@ -420,25 +405,15 @@ namespace Jellyfin.XmlTv
                                 if (string.Equals(nodeName, "image", StringComparison.OrdinalIgnoreCase))
                                 {
                                     // Image
-                                    var image = ProcessImageNode(creditXml);
-                                    if (image is not null)
-                                    {
-                                        images.Add(image);
-                                    }
+                                    ProcessImageNode(creditXml, credit);
                                 }
                                 else if (string.Equals(nodeName, "url", StringComparison.OrdinalIgnoreCase))
                                 {
                                     // URL
-                                    var url = ProcessUrlNode(creditXml);
-                                    if (url is not null)
-                                    {
-                                        urls.Add(url);
-                                    }
+                                    ProcessUrlNode(creditXml, credit);
                                 }
-                                else
-                                {
-                                    creditXml.Skip();
-                                }
+
+                                creditXml.Skip();
                             }
                             else
                             {
@@ -448,9 +423,14 @@ namespace Jellyfin.XmlTv
 
                         if (credit is not null)
                         {
-                            credit.Images = images.Count == 0 ? null : images;
-                            credit.Urls = urls.Count == 0 ? null : urls;
-                            result.Credits.Add(credit);
+                            if (result.Credits is null)
+                            {
+                                result.Credits = [credit];
+                            }
+                            else
+                            {
+                                result.Credits!.Add(credit);
+                            }
                         }
                     }
                     else
@@ -796,8 +776,6 @@ namespace Jellyfin.XmlTv
             */
 
             ProcessMultipleNodes(reader, result.Categories.Add, _language);
-
-            // result.Categories.Add(reader.ReadElementContentAsString());
         }
 
         public void ProcessCountry(XmlReader reader, XmlTvProgram result)
@@ -844,7 +822,7 @@ namespace Jellyfin.XmlTv
                 _language);
         }
 
-        public XmlTvIcon? ProcessIconNode(XmlReader reader)
+        public void ProcessIconNode(XmlReader reader, IHasIcons output)
         {
             var result = new XmlTvIcon();
             var isPopulated = false;
@@ -870,49 +848,108 @@ namespace Jellyfin.XmlTv
                 isPopulated = true;
             }
 
-            return isPopulated ? result : null;
+            if (!isPopulated)
+            {
+                return;
+            }
+
+            if (output.Icons == null)
+            {
+                output.Icons = [result];
+
+                return;
+            }
+
+            output.Icons.Add(result);
         }
 
-        public XmlTvImage ProcessImageNode(XmlReader reader)
+        public void ProcessImageNode(XmlReader reader, IHasImages output)
         {
             var result = new XmlTvImage();
+            var isPopulated = false;
 
             var typeString = reader.GetAttribute("type");
             if (!string.IsNullOrEmpty(typeString) && Enum.TryParse<ImageType>(typeString, true, out var parsedType))
             {
                 result.Type = parsedType;
+                isPopulated = true;
             }
 
             var sizeString = reader.GetAttribute("size");
             if (!string.IsNullOrEmpty(sizeString) && Enum.TryParse<ImageSize>(sizeString, true, out var parsedSize))
             {
                 result.Size = parsedSize;
+                isPopulated = true;
             }
 
             var orientationString = reader.GetAttribute("orient");
             if (!string.IsNullOrEmpty(orientationString) && Enum.TryParse<ImageOrientation>(orientationString, true, out var parsedOrientation))
             {
                 result.Orientation = parsedOrientation;
+                isPopulated = true;
             }
 
-            var systemString = reader.GetAttribute("system");
-            result.System = GetSystem(systemString);
+            var system = GetSystem(reader.GetAttribute("system"));
+            if (system is not null)
+            {
+                result.System = system;
+                isPopulated = true;
+            }
 
-            result.Path = reader.ReadElementContentAsString();
+            var path = reader.ReadElementContentAsString();
+            if (!string.IsNullOrEmpty(path))
+            {
+                result.Path = path;
+                isPopulated = true;
+            }
 
-            return result;
+            if (!isPopulated)
+            {
+                return;
+            }
+
+            if (output.Images == null)
+            {
+                output.Images = [result];
+
+                return;
+            }
+
+            output.Images.Add(result);
         }
 
-        public XmlTvUrl ProcessUrlNode(XmlReader reader)
+        public void ProcessUrlNode(XmlReader reader, IHasUrls output)
         {
             var result = new XmlTvUrl();
+            var isPopulated = false;
 
-            var systemString = reader.GetAttribute("system");
-            result.System = GetSystem(systemString);
+            var system = GetSystem(reader.GetAttribute("system"));
+            if (!string.IsNullOrEmpty(system))
+            {
+                result.System = system;
+                isPopulated = true;
+            }
 
-            result.Uri = reader.ReadElementContentAsString();
+            var uri = reader.ReadElementContentAsString();
+            if (!string.IsNullOrEmpty(uri))
+            {
+                result.Uri = uri;
+                isPopulated = true;
+            }
 
-            return result;
+            if (!isPopulated)
+            {
+                return;
+            }
+
+            if (output.Urls == null)
+            {
+                output.Urls = [result];
+
+                return;
+            }
+
+            output.Urls.Add(result);
         }
 
         public string? GetSystem(string? systemString)
@@ -1149,9 +1186,9 @@ namespace Jellyfin.XmlTv
             }
 
             const string CompleteDate = "20000101000000";
-            var dateComponent = string.Empty;
             string? dateOffset = null;
-            var match = Regex.Match(dateValue, DateWithOffsetRegex);
+            var match = DateWithOffsetRegex().Match(dateValue);
+            string? dateComponent;
             if (match.Success)
             {
                 dateComponent = match.Groups["dateDigits"].Value;
@@ -1204,7 +1241,7 @@ namespace Jellyfin.XmlTv
             var dateComponent = string.Empty;
             var dateOffset = "+0000";
 
-            var match = Regex.Match(value, DateWithOffsetRegex);
+            var match = DateWithOffsetRegex().Match(value);
             if (match.Success)
             {
                 dateComponent = match.Groups["dateDigits"].Value;

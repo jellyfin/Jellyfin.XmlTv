@@ -19,41 +19,49 @@ namespace Jellyfin.XmlTv.Tests
             // Check each channel
             var channel = channels.SingleOrDefault(c => c.Id == "UK_RT_2667");
             Assert.NotNull(channel);
-            Assert.Equal("BBC1 HD", channel!.DisplayName);
+            Assert.Equal("BBC1 HD", channel.DisplayName);
             Assert.Equal("7.1", channel.Number);
-            Assert.NotNull(channel.Icon);
-            Assert.Equal("Logo_UK_RT_2667", channel!.Icon!.Source);
-            Assert.Equal(100, channel.Icon.Width);
-            Assert.Equal(200, channel.Icon.Height);
+
+            var icon = channel.Icons?.FirstOrDefault();
+            Assert.NotNull(icon);
+            Assert.Equal("Logo_UK_RT_2667", icon.Source);
+            Assert.Equal(100, icon.Width);
+            Assert.Equal(200, icon.Height);
 
             channel = channels.SingleOrDefault(c => c.Id == "UK_RT_105");
             Assert.NotNull(channel);
-            Assert.Equal("BBC2", channel!.DisplayName);
-            Assert.NotNull(channel.Icon);
-            Assert.Equal("Logo_UK_RT_105", channel!.Icon!.Source);
-            Assert.False(channel.Icon.Width.HasValue);
-            Assert.False(channel.Icon.Height.HasValue);
+            Assert.Equal("BBC2", channel.DisplayName);
+
+            icon = channel.Icons?.FirstOrDefault();
+            Assert.NotNull(icon);
+            Assert.Equal("Logo_UK_RT_105", icon.Source);
+            Assert.False(icon.Width.HasValue);
+            Assert.False(icon.Height.HasValue);
 
             channel = channels.SingleOrDefault(c => c.Id == "UK_RT_2118");
             Assert.NotNull(channel);
-            Assert.Equal("ITV1 HD", channel!.DisplayName);
-            Assert.NotNull(channel.Icon);
-            Assert.Equal("Logo_UK_RT_2118", channel!.Icon!.Source);
-            Assert.Equal(100, channel.Icon.Width);
-            Assert.False(channel.Icon.Height.HasValue);
+            Assert.Equal("ITV1 HD", channel.DisplayName);
+
+            icon = channel.Icons?.FirstOrDefault();
+            Assert.NotNull(icon);
+            Assert.Equal("Logo_UK_RT_2118", icon.Source);
+            Assert.Equal(100, icon.Width);
+            Assert.False(icon.Height.HasValue);
 
             channel = channels.SingleOrDefault(c => c.Id == "UK_RT_2056");
             Assert.NotNull(channel);
-            Assert.Equal("Channel 4 HD", channel!.DisplayName);
-            Assert.NotNull(channel.Icon);
-            Assert.Equal("Logo_UK_RT_2056", channel!.Icon!.Source);
-            Assert.False(channel.Icon.Width.HasValue);
-            Assert.Equal(200, channel.Icon.Height);
+            Assert.Equal("Channel 4 HD", channel.DisplayName);
+
+            icon = channel.Icons?.First();
+            Assert.NotNull(icon);
+            Assert.Equal("Logo_UK_RT_2056", icon.Source);
+            Assert.False(icon.Width.HasValue);
+            Assert.Equal(200, icon.Height);
 
             channel = channels.SingleOrDefault(c => c.Id == "UK_RT_134");
             Assert.NotNull(channel);
-            Assert.Equal("Channel 5", channel!.DisplayName);
-            Assert.Null(channel.Icon);
+            Assert.Equal("Channel 5", channel.DisplayName);
+            Assert.Null(channel.Icons);
         }
 
         [Fact]
@@ -214,10 +222,12 @@ namespace Jellyfin.XmlTv.Tests
 
             var programme = programmes.SingleOrDefault(p => p.Title == "Match Game");
             Assert.NotNull(programme!.Episode);
-            Assert.True(programme.Credits.Count == 9);
+            Assert.True(programme.Credits?.Count == 9);
+            Assert.True(programme.Icons?.Count == 4);
 
-            Assert.NotNull(programme.Icon);
-            Assert.True(programme!.Icon!.Width > programme.Icon.Height);
+            var icon = programme.Icons?.FirstOrDefault(s => s.Width > s.Height);
+            Assert.NotNull(icon);
+            Assert.True(icon!.Width > icon.Height);
         }
 
         [Fact]
@@ -236,14 +246,19 @@ namespace Jellyfin.XmlTv.Tests
             var programmes = reader.GetProgrammes(channel!.Id, startDate, startDate.AddDays(1)).ToList();
 
             var programme = programmes.SingleOrDefault(p => p.Title == "Unforgettable");
-            Assert.True(programme?.Images?.Count == 4);
+            Assert.NotNull(programme);
+            Assert.True(programme.Images?.Count == 4);
+            Assert.True(programme.Icons?.Count == 5);
+
             var credits = programme.Credits;
-            Assert.True(credits.Count == 30);
+            Assert.NotNull(credits);
+            Assert.True(credits?.Count == 30);
             Assert.True(credits[5]?.Images?.Count == 1);
             Assert.True(credits[5]?.Urls?.Count == 1);
 
-            Assert.NotNull(programme.Icon);
-            Assert.True(programme!.Icon!.Width > programme.Icon.Height);
+            var icon = programme.Icons?.FirstOrDefault(s => s.Width > s.Height);
+            Assert.NotNull(icon);
+            Assert.Equal("p8680420_b_h12_ag.jpg", icon.Source);
         }
     }
 }

@@ -1,11 +1,15 @@
-#pragma warning disable CS1591
+#pragma warning disable CA1002 // Do not expose generic lists
+#pragma warning disable CA2227 // Collection properties should be read only
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 using System;
+using System.Collections.Generic;
 using System.Text;
+using Jellyfin.XmlTv.Interfaces;
 
 namespace Jellyfin.XmlTv.Entities
 {
-    public class XmlTvChannel : IEquatable<XmlTvChannel>
+    public class XmlTvChannel : IEquatable<XmlTvChannel>, IHasIcons, IHasUrls
     {
         public XmlTvChannel(string id)
         {
@@ -18,9 +22,9 @@ namespace Jellyfin.XmlTv.Entities
 
         public string? Number { get; set; }
 
-        public string? Url { get; set; }
+        public List<XmlTvUrl>? Urls { get; set; }
 
-        public XmlTvIcon? Icon { get; set; }
+        public List<XmlTvIcon>? Icons { get; set; }
 
         /// <inheritdoc />
         public bool Equals(XmlTvChannel? other)
@@ -50,11 +54,6 @@ namespace Jellyfin.XmlTv.Entities
         {
             var builder = new StringBuilder();
             builder.Append(Id).Append(" - ").Append(DisplayName).Append(' ');
-
-            if (!string.IsNullOrEmpty(Url))
-            {
-                builder.Append(" (").Append(Url).Append(')');
-            }
 
             return builder.ToString();
         }

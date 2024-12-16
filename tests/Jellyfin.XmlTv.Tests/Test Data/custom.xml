@@ -70,7 +70,7 @@
     <review type="url" source="Rotten Tomatoes" reviewer="Joe Bloggs" lang="en">https://example.com/programme_one_review</review>
     <image type="poster" size="1" orient="P" system="tvdb">https://tvdb.com/programme_one_poster_1.jpg</image>
     <image type="poster" size="2" orient="P" system="tmdb">https://tmdb.com/programme_one_poster_2.jpg</image>
-    <image type="backdrop" size="3" orient="L" system="tvdb">https://tvdb.com/programme_one_backdrop_3.jpg</image>
+    <image type="backdrop" size="3" orient="L" system="tvdb">https://tvdb.com/programme_one_backdrop_2.jpg</image>
     <image type="backdrop" size="3" orient="L" system="tmdb">https://tmdb.com/programme_one_backdrop_3.jpg</image>
     <episode-num system="dd_progid">EP01419807.0010</episode-num>
     <episode-num system="xmltv_ns">0.9.0/1</episode-num>

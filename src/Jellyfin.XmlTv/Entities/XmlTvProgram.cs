@@ -6,10 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using Jellyfin.XmlTv.Interfaces;
 
 namespace Jellyfin.XmlTv.Entities
 {
-    public class XmlTvProgram : IEquatable<XmlTvProgram>
+    public class XmlTvProgram : IEquatable<XmlTvProgram>, IHasImages, IHasIcons, IHasUrls
     {
         public XmlTvProgram(string channelId)
         {
@@ -53,13 +54,11 @@ namespace Jellyfin.XmlTv.Entities
 
         public XmlTvEpisode? Episode { get; set; }
 
-        public List<XmlTvCredit> Credits { get; }
+        public List<XmlTvCredit>? Credits { get; set; }
 
         public XmlTvRating? Rating { get; set; }
 
         public float? StarRating { get; set; }
-
-        public XmlTvIcon? Icon { get; set; }
 
         public List<XmlTvImage>? Images { get; set; }
 
@@ -68,6 +67,10 @@ namespace Jellyfin.XmlTv.Entities
         public Dictionary<string, string> ProviderIds { get; }
 
         public Dictionary<string, string> SeriesProviderIds { get; }
+
+        public List<XmlTvIcon>? Icons { get; set; }
+
+        public List<XmlTvUrl>? Urls { get; set; }
 
         /// <inheritdoc />
         public bool Equals(XmlTvProgram? other)
