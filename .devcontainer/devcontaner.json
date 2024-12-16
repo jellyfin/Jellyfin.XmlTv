@@ -1,0 +1,21 @@
+{
+    "name": "Jellyfin XMLTV Development",
+    "image":"mcr.microsoft.com/devcontainers/dotnet:9.0-bookworm",
+    "postAttachCommand": "cat .vscode/extensions.json | jq -r .recommendations[] | xargs -n 1 code --install-extension",
+    "features": {
+        "ghcr.io/devcontainers/features/dotnet:2": {
+            "version": "none",
+            "dotnetRuntimeVersions": "9.0",
+            "aspNetCoreRuntimeVersions": "9.0"
+        },
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {
+            "dockerDashComposeVersion": "v2"
+        },
+        "ghcr.io/devcontainers/features/github-cli:1": {},
+        "ghcr.io/eitsupi/devcontainer-features/jq-likes:2": {}
+    },
+    "hostRequirements": {
+        "memory": "4gb",
+        "cpus": 2
+    }
+}
