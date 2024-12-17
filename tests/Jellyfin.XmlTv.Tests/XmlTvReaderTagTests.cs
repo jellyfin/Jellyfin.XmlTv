@@ -73,7 +73,7 @@ public class XmlTvReaderTagTests
     public void GetProgramme_ProcessCategory_SelectsCorrectCategories(string categoryInput, string? language, string[] expected)
     {
         var channel = "channel";
-        var inputString = String.Format(CultureInfo.InvariantCulture, _programmeFormat, channel, categoryInput);
+        var inputString = string.Format(CultureInfo.InvariantCulture, _programmeFormat, channel, categoryInput);
 
         var xmlTvReader = new XmlTvReader("file", language);
         using var reader = XmlReader.Create(new StringReader(inputString));
@@ -91,7 +91,7 @@ public class XmlTvReaderTagTests
     public void GetProgramme_NoEpisodeTags_NullEpisode(string input)
     {
         var channel = "channel";
-        var inputString = String.Format(CultureInfo.InvariantCulture, _programmeFormat, channel, input);
+        var inputString = string.Format(CultureInfo.InvariantCulture, _programmeFormat, channel, input);
 
         var xmlTvReader = new XmlTvReader("file");
         using var reader = XmlReader.Create(new StringReader(inputString));
@@ -110,7 +110,7 @@ public class XmlTvReaderTagTests
     public void GetProgramme_ProcessEpisodeNumSxxExx_Success(string input, int? series, int? episode)
     {
         var channel = "channel";
-        var inputString = String.Format(CultureInfo.InvariantCulture, _programmeFormat, channel, String.Format(CultureInfo.InvariantCulture, _episodeNumFormat, "SxxExx", input));
+        var inputString = string.Format(CultureInfo.InvariantCulture, _programmeFormat, channel, string.Format(CultureInfo.InvariantCulture, _episodeNumFormat, "SxxExx", input));
 
         var xmlTvReader = new XmlTvReader("file");
         using var reader = XmlReader.Create(new StringReader(inputString));
@@ -137,7 +137,7 @@ public class XmlTvReaderTagTests
     public void GetProgramme_ProcessEpisodeNumXmlTvNs_Success(string input, int? series, int? episode, int? part, int? seriesCount = null, int? episodeCount = null, int? partCount = null)
     {
         var channel = "channel";
-        var inputString = String.Format(CultureInfo.InvariantCulture, _programmeFormat, channel, String.Format(CultureInfo.InvariantCulture, _episodeNumFormat, "xmltv_ns", input));
+        var inputString = string.Format(CultureInfo.InvariantCulture, _programmeFormat, channel, string.Format(CultureInfo.InvariantCulture, _episodeNumFormat, "xmltv_ns", input));
 
         var xmlTvReader = new XmlTvReader("file");
         using var reader = XmlReader.Create(new StringReader(inputString));
@@ -160,9 +160,9 @@ public class XmlTvReaderTagTests
     {
         var channel = "channel";
         // add multiple conflicting episode numbers
-        var sxxExx = String.Format(CultureInfo.InvariantCulture, _episodeNumFormat, "SxxExx", "S01E02");
-        var xmltvNs = String.Format(CultureInfo.InvariantCulture, _episodeNumFormat, "xmltv_ns", "1.3.0");
-        var inputString = String.Format(CultureInfo.InvariantCulture, _programmeFormat, channel, sxxExx + xmltvNs);
+        var sxxExx = string.Format(CultureInfo.InvariantCulture, _episodeNumFormat, "SxxExx", "S01E02");
+        var xmltvNs = string.Format(CultureInfo.InvariantCulture, _episodeNumFormat, "xmltv_ns", "1.3.0");
+        var inputString = string.Format(CultureInfo.InvariantCulture, _programmeFormat, channel, sxxExx + xmltvNs);
 
         var xmlTvReader = new XmlTvReader("file");
         using var reader = XmlReader.Create(new StringReader(inputString));
@@ -187,7 +187,7 @@ public class XmlTvReaderTagTests
     public void GetProgramme_ProcessSubTitle_SelectsCorrectSubtitle(string subTitleInput, string? language, string? expected)
     {
         var channel = "channel";
-        var inputString = String.Format(CultureInfo.InvariantCulture, _programmeFormat, channel, subTitleInput);
+        var inputString = string.Format(CultureInfo.InvariantCulture, _programmeFormat, channel, subTitleInput);
 
         var xmlTvReader = new XmlTvReader("file", language);
         using var reader = XmlReader.Create(new StringReader(inputString));

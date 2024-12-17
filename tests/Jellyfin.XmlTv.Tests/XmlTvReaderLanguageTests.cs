@@ -142,7 +142,7 @@ namespace Jellyfin.XmlTv.Tests
         {
             var testFile = Path.Join("Test Data", "MultilanguageData.xml");
             var reader = new XmlTvReader(testFile);
-            var results = reader.GetLanguages();
+            var results = reader.GetLanguages().ToList();
             Assert.NotNull(results);
             Assert.Equal(2, results.Count);
             Assert.Equal("en", results[0].Name);
