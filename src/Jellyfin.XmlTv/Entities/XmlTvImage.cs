@@ -4,7 +4,7 @@ using Jellyfin.XmlTv.Enums;
 namespace Jellyfin.XmlTv.Entities;
 
 /// <summary>
-/// Class XmlTvImage.
+/// Image class.
 /// </summary>
 public class XmlTvImage
 {

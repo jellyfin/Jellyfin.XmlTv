@@ -1,7 +1,7 @@
 namespace Jellyfin.XmlTv.Entities;
 
 /// <summary>
-/// Class XmlTvLanguage.
+/// Language class.
 /// </summary>
 public class XmlTvLanguage
 {

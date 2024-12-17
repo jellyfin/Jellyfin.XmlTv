@@ -16,8 +16,8 @@ public class XmlTvCredit : IHasUrls, IHasImages
     /// <summary>
     /// Initializes a new instance of the <see cref="XmlTvCredit"/> class.
     /// </summary>
-    /// <param name="type">The <see cref="CreditType"/>.</param>
-    /// <param name="guest">a value indicating whether the credit is a guest.</param>
+    /// <param name="type">The id.</param>
+    /// <param name="guest">A value indicating whether the credit is a guest.</param>
     public XmlTvCredit(CreditType type, bool guest = false)
     {
         Type = type;

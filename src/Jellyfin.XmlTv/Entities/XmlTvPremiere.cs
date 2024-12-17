@@ -1,19 +1,21 @@
-#pragma warning disable CS1591
+namespace Jellyfin.XmlTv.Entities;
 
-namespace Jellyfin.XmlTv.Entities
+/// <summary>
+/// Premier class.
+/// </summary>
+public class XmlTvPremiere
 {
-    /*
-    <premiere lang="en">
-      First showing on national terrestrial TV
-    </premiere>
-    */
-    public class XmlTvPremiere
+    /// <summary>
+    /// Initializes a new instance of the <see cref="XmlTvPremiere"/> class.
+    /// </summary>
+    /// <param name="details">The details.</param>
+    public XmlTvPremiere(string details)
     {
-        public XmlTvPremiere(string details)
-        {
-            Details = details;
-        }
-
-        public string Details { get; }
+        Details = details;
     }
+
+    /// <summary>
+    /// Gets the details denoting the first showing on natonal TV.
+    /// </summary>
+    public string Details { get; }
 }

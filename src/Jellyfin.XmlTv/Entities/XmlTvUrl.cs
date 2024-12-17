@@ -1,7 +1,7 @@
 namespace Jellyfin.XmlTv.Entities;
 
 /// <summary>
-/// Class XmlTvUrl.
+/// URL class.
 /// </summary>
 public class XmlTvUrl
 {

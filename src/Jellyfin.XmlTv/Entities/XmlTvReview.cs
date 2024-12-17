@@ -4,7 +4,7 @@ using Jellyfin.XmlTv.Enums;
 namespace Jellyfin.XmlTv.Entities;
 
 /// <summary>
-/// Class XmlTvReview.
+/// Review class.
 /// </summary>
 public class XmlTvReview
 {

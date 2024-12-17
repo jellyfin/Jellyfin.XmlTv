@@ -3,7 +3,7 @@ using System.Text;
 namespace Jellyfin.XmlTv.Entities;
 
 /// <summary>
-/// Class XmlTvIcon.
+/// Icon class.
 /// </summary>
 public class XmlTvIcon
 {
