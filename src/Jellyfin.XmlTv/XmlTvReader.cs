@@ -222,6 +222,15 @@ namespace Jellyfin.XmlTv
                             case "desc":
                                 ProcessDescription(xmlProg, result);
                                 break;
+                            case "keyword":
+                                ProcessKeyword(xmlProg, result);
+                                break;
+                            case "language":
+                                ProcessLanguage(xmlProg, result);
+                                break;
+                            case "orig-language":
+                                ProcessOriginalLanguage(xmlProg, result);
+                                break;
                             case "sub-title":
                                 ProcessSubTitle(xmlProg, result);
                                 break;
@@ -769,6 +778,18 @@ namespace Jellyfin.XmlTv
             reader.Skip(); // Move on
         }
 
+        public void ProcessLanguage(XmlReader reader, XmlTvProgram result)
+        {
+            result.Language = reader.ReadElementContentAsString();
+            reader.Skip(); // Move on
+        }
+
+        public void ProcessOriginalLanguage(XmlReader reader, XmlTvProgram result)
+        {
+            result.OriginalLanguage = reader.ReadElementContentAsString();
+            reader.Skip(); // Move on
+        }
+
         public void ProcessCategory(XmlReader reader, XmlTvProgram result)
         {
             /*
@@ -776,6 +797,15 @@ namespace Jellyfin.XmlTv
             */
 
             ProcessMultipleNodes(reader, result.Categories.Add, _language);
+        }
+
+        public void ProcessKeyword(XmlReader reader, XmlTvProgram result)
+        {
+            /*
+            <keyword lang="en">News</category>
+            */
+
+            ProcessMultipleNodes(reader, result.Keywords.Add, _language);
         }
 
         public void ProcessCountry(XmlReader reader, XmlTvProgram result)
@@ -981,7 +1011,12 @@ namespace Jellyfin.XmlTv
                 var language = reader.GetAttribute("lang");
                 resultCandidate = reader.ReadElementContentAsString();
 
-                if (language == _language && !exactMatchFound)
+                if (string.Equals(language, _language, StringComparison.OrdinalIgnoreCase))
+                {
+                    result = resultCandidate;
+                    exactMatchFound = true;
+                }
+                else if (!exactMatchFound && language is null)
                 {
                     result = resultCandidate;
                 }
