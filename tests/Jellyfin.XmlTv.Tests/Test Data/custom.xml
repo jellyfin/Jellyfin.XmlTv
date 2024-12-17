@@ -7,14 +7,7 @@
     <display-name>201</display-name>
     <display-name>CTV</display-name>
     <icon src="s10108_dark_360w_270h.png" width="360" height="270" />
-  </channel>
-  <channel id="EPG123.10091.schedulesdirect.org">
-    <display-name>CBLT</display-name>
-    <display-name>CBLT - CBC Toronto</display-name>
-    <display-name>205 CBLT</display-name>
-    <display-name>205</display-name>
-    <display-name>CBC</display-name>
-    <icon src="s10091_dark_360w_270h.png" width="360" height="270" />
+    <url system="imdb">https://example.com/channel_one</url>
   </channel>
   <programme start="20200729010000 +0000" stop="20200729020100 +0000" channel="EPG123.10108.schedulesdirect.org">
     <title>Unforgettable</title>
@@ -30,6 +23,7 @@
         Daya Vaidya
         <image type="person">https://example.com/xxx.jpg</image>
         <url system="moviedb">https://example.com/person/204</url>
+        <url system="imdb">https://example.com/person/205</url>
       </actor>
       <writer>Erik Oleson</writer>
       <producer>Ed Redlich</producer>
@@ -88,5 +82,7 @@
     <rating system="VCHIP">
       <value>TV-14</value>
     </rating>
+    <url system="imdb">https://example.com/programme</url>
+    <url system="tmdb">https://example.com/programme1</url>
   </programme>
   </tv>
