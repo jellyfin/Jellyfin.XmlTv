@@ -1,33 +1,42 @@
-#pragma warning disable CS1591
-
 using System.Text;
 
-namespace Jellyfin.XmlTv.Entities
+namespace Jellyfin.XmlTv.Entities;
+
+/// <summary>
+/// Icon class.
+/// </summary>
+public class XmlTvIcon
 {
-    public class XmlTvIcon
+    /// <summary>
+    /// Gets or sets the source.
+    /// </summary>
+    public string? Source { get; set; }
+
+    /// <summary>
+    /// Gets or sets the width.
+    /// </summary>
+    public int? Width { get; set; }
+
+    /// <summary>
+    /// Gets or sets the height.
+    /// </summary>
+    public int? Height { get; set; }
+
+    /// <inheritdoc />
+    public override string ToString()
     {
-        public string? Source { get; set; }
-
-        public int? Width { get; set; }
-
-        public int? Height { get; set; }
-
-        /// <inheritdoc />
-        public override string ToString()
+        var builder = new StringBuilder();
+        builder.Append("Source: ").Append(Source);
+        if (Width.HasValue)
         {
-            var builder = new StringBuilder();
-            builder.Append("Source: ").Append(Source);
-            if (Width.HasValue)
-            {
-                builder.Append(", Width: ").Append(Width);
-            }
-
-            if (Height.HasValue)
-            {
-                builder.Append(", Height: ").Append(Height);
-            }
-
-            return builder.ToString();
+            builder.Append(", Width: ").Append(Width);
         }
+
+        if (Height.HasValue)
+        {
+            builder.Append(", Height: ").Append(Height);
+        }
+
+        return builder.ToString();
     }
 }

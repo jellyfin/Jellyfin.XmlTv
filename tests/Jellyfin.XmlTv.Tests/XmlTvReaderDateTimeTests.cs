@@ -34,7 +34,7 @@ namespace Jellyfin.XmlTv.Tests
         public void HandlePartDatesTest(string expected, string value)
         {
             Assert.Equal(
-                DateTimeOffset.Parse(expected, styles: DateTimeStyles.AssumeUniversal),
+                DateTimeOffset.Parse(expected, DateTimeFormatInfo.CurrentInfo, DateTimeStyles.AssumeUniversal),
                 XmlTvReader.ParseDate(value));
         }
 

@@ -1,43 +1,43 @@
-using System.Text;
+#pragma warning disable CA1002 // Do not expose generic lists
+#pragma warning disable CA2227 // Collection properties should be read only
 
-namespace Jellyfin.XmlTv.Entities
+using System.Collections.Generic;
+using System.Text;
+using Jellyfin.XmlTv.Interfaces;
+
+namespace Jellyfin.XmlTv.Entities;
+
+/// <summary>
+/// Describes the rating (certification) applied to a program.
+/// </summary>
+public class XmlTvRating : IHasIcons
 {
     /// <summary>
-    /// Describes the rating (certification) applied to a program.
+    /// Gets or sets the literal name of the rating system.
     /// </summary>
-    public class XmlTvRating
+    /// Example: MPAA
+    public string? System { get; set; }
+
+    /// <summary>
+    /// Gets or sets the rating using the system specified.
+    /// </summary>
+    // Example: TV-14
+    public string? Value { get; set; }
+
+    /// <summary>
+    /// Gets or sets the icons.
+    /// </summary>
+    public List<XmlTvIcon>? Icons { get; set; }
+
+    /// <inheritdoc />
+    public override string ToString()
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="XmlTvRating"/> class.
-        /// </summary>
-        /// <param name="value">The rating.</param>
-        public XmlTvRating(string value)
+        var builder = new StringBuilder(Value);
+        if (!string.IsNullOrEmpty(System))
         {
-            Value = value;
+            builder.Append(" (").Append(System).Append(')');
         }
 
-        /// <summary>
-        /// Gets or sets the literal name of the rating system.
-        /// </summary>
-        /// Example: MPAA
-        public string? System { get; set; }
-
-        /// <summary>
-        /// Gets the rating using the system specificed.
-        /// </summary>
-        // Example: TV-14
-        public string Value { get; }
-
-        /// <inheritdoc />
-        public override string ToString()
-        {
-            var builder = new StringBuilder(Value);
-            if (!string.IsNullOrEmpty(System))
-            {
-                builder.Append(" (").Append(System).Append(')');
-            }
-
-            return builder.ToString();
-        }
+        return builder.ToString();
     }
 }
