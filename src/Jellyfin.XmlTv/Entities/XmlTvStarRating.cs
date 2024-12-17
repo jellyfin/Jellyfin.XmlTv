@@ -2,27 +2,27 @@
 #pragma warning disable CA2227 // Collection properties should be read only
 
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using Jellyfin.XmlTv.Interfaces;
 
 namespace Jellyfin.XmlTv.Entities;
 
 /// <summary>
-/// Describes the rating (certification) applied to a program.
+/// StarRating class.
 /// </summary>
-public class XmlTvRating : IHasIcons
+public class XmlTvStarRating : IHasIcons
 {
     /// <summary>
-    /// Gets or sets the literal name of the rating system.
+    /// Gets or sets the system.
     /// </summary>
-    /// Example: MPAA
+    /// Example: TV Guide
     public string? System { get; set; }
 
     /// <summary>
-    /// Gets or sets the rating using the system specified.
+    /// Gets or setsthe star rating.
     /// </summary>
-    // Example: TV-14
-    public string? Value { get; set; }
+    public decimal? StarRating { get; set; }
 
     /// <summary>
     /// Gets or sets the icons.
@@ -32,7 +32,8 @@ public class XmlTvRating : IHasIcons
     /// <inheritdoc />
     public override string ToString()
     {
-        var builder = new StringBuilder(Value);
+        var builder = new StringBuilder(StarRating?.ToString(CultureInfo.InvariantCulture));
+
         if (!string.IsNullOrEmpty(System))
         {
             builder.Append(" (").Append(System).Append(')');

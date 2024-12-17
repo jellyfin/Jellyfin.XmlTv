@@ -128,12 +128,12 @@ public class XmlTvProgram : IEquatable<XmlTvProgram>, IHasImages, IHasIcons, IHa
     /// <summary>
     /// Gets or sets the rating.
     /// </summary>
-    public XmlTvRating? Rating { get; set; }
+    public List<XmlTvRating>? Ratings { get; set; }
 
     /// <summary>
-    /// Gets or sets the star rating.
+    /// Gets or sets the star ratings.
     /// </summary>
-    public float? StarRating { get; set; }
+    public List<XmlTvStarRating>? StarRatings { get; set; }
 
     /// <summary>
     /// Gets or sets the images.

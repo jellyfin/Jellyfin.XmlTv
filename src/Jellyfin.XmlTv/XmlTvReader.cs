@@ -438,7 +438,7 @@ namespace Jellyfin.XmlTv
                             }
                             else
                             {
-                                result.Credits!.Add(credit);
+                                result.Credits.Add(credit);
                             }
                         }
                     }
@@ -457,28 +457,68 @@ namespace Jellyfin.XmlTv
         public void ProcessStarRating(XmlReader reader, XmlTvProgram result)
         {
             /*
-             <star-rating>
-              <value>3/3</value>
+            <star-rating system="TV Guide">
+                <value>4/5</value>
+                <icon src="stars.png" />
             </star-rating>
             */
 
-            reader.ReadToDescendant("value");
-            if (reader.Name == "value")
+            var rating = new XmlTvStarRating();
+            var system = reader.GetAttribute("system");
+            if (!string.IsNullOrEmpty(system))
             {
-                var textValue = reader.ReadElementContentAsString();
-                int index = textValue.IndexOf('/', StringComparison.Ordinal);
-                if (index != -1)
+                rating.System = system;
+            }
+
+            // Loop through each element
+            using var starRatingXml = reader.ReadSubtree();
+            starRatingXml.MoveToContent();
+            starRatingXml.Read();
+            while (!starRatingXml.EOF && starRatingXml.ReadState == ReadState.Interactive)
+            {
+                if (starRatingXml.NodeType == XmlNodeType.Element)
                 {
-                    var substring = textValue.Substring(index);
-                    if (float.TryParse(substring, out var value))
+                    var nodeName = starRatingXml.Name;
+                    if (string.Equals(nodeName, "value", StringComparison.OrdinalIgnoreCase))
                     {
-                        result.StarRating = value;
+                        // Value
+                        var textValue = reader.ReadElementContentAsString();
+                        int index = textValue.IndexOf('/', StringComparison.Ordinal);
+                        if (index != -1)
+                        {
+                            var substring = textValue.Substring(index);
+                            if (decimal.TryParse(substring, out var value))
+                            {
+                                rating.StarRating = value;
+                            }
+                            else
+                            {
+                                starRatingXml.Skip();
+                                return;
+                            }
+                        }
                     }
+                    else if (string.Equals(nodeName, "icon", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Icon
+                        ProcessIconNode(starRatingXml, rating);
+                    }
+
+                    starRatingXml.Skip();
                 }
+                else
+                {
+                    starRatingXml.Skip();
+                }
+            }
+
+            if (result.StarRatings is null)
+            {
+                result.StarRatings = [rating];
             }
             else
             {
-                reader.Skip();
+                result.StarRatings.Add(rating);
             }
         }
 
@@ -486,23 +526,60 @@ namespace Jellyfin.XmlTv
         {
             /*
             <rating system="MPAA">
-                <value>TV-G</value>
+                <value>NC-17</value>
+                <icon src="NC-17_symbol.png" />
             </rating>
             */
 
+            var rating = new XmlTvRating();
             var system = reader.GetAttribute("system");
-
-            reader.ReadToDescendant("value");
-            if (reader.Name == "value")
+            if (!string.IsNullOrEmpty(system))
             {
-                result.Rating = new XmlTvRating(reader.ReadElementContentAsString())
+                rating.System = system;
+            }
+
+            // Loop through each element
+            using var starRatingXml = reader.ReadSubtree();
+            starRatingXml.MoveToContent();
+            starRatingXml.Read();
+            while (!starRatingXml.EOF && starRatingXml.ReadState == ReadState.Interactive)
+            {
+                if (starRatingXml.NodeType == XmlNodeType.Element)
                 {
-                    System = system
-                };
+                    var nodeName = starRatingXml.Name;
+                    if (string.Equals(nodeName, "value", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Value
+                        var value = reader.ReadElementContentAsString();
+                        if (string.IsNullOrEmpty(value))
+                        {
+                            starRatingXml.Skip();
+                            return;
+                        }
+
+                        rating.Value = value;
+                    }
+                    else if (string.Equals(nodeName, "icon", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Icon
+                        ProcessIconNode(starRatingXml, rating);
+                    }
+
+                    starRatingXml.Skip();
+                }
+                else
+                {
+                    starRatingXml.Skip();
+                }
+            }
+
+            if (result.Ratings is null)
+            {
+                result.Ratings = [rating];
             }
             else
             {
-                reader.Skip();
+                result.Ratings.Add(rating);
             }
         }
 
