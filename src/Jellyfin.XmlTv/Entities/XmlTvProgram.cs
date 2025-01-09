@@ -187,8 +187,7 @@ public class XmlTvProgram : IEquatable<XmlTvProgram>, IHasImages, IHasIcons, IHa
     }
 
     /// <inheritdoc />
-    public override int GetHashCode()
-        => (ChannelId.GetHashCode(StringComparison.Ordinal) * 17) + (StartDate.GetHashCode() * 17) + (EndDate.GetHashCode() * 17);
+    public override int GetHashCode() => HashCode.Combine(ChannelId, StartDate, EndDate);
 
     /// <inheritdoc />
     public override string ToString()

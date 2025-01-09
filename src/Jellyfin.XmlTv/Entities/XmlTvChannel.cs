@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Globalization;
 using Jellyfin.XmlTv.Interfaces;
 
 namespace Jellyfin.XmlTv.Entities;
@@ -67,16 +67,12 @@ public class XmlTvChannel : IEquatable<XmlTvChannel>, IHasIcons, IHasUrls
     }
 
     /// <inheritdoc />
-    public override int GetHashCode()
-        => Id.GetHashCode(StringComparison.Ordinal) * 17;
+    public override int GetHashCode() => HashCode.Combine(Id);
 
     /// <inheritdoc />
     public override string ToString()
     {
-        var builder = new StringBuilder();
-        builder.Append(Id).Append(" - ").Append(DisplayName).Append(' ');
-
-        return builder.ToString();
+        return string.Format(CultureInfo.InvariantCulture, "{0} - {1}", Id, DisplayName);
     }
 
     /// <inheritdoc />
