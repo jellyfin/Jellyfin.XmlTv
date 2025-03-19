@@ -1247,7 +1247,7 @@ public partial class XmlTvReader
     /// Parses a string into <see cref="DateTimeOffset"/> if possible.
     /// </summary>
     /// <param name="dateValue">The input string.</param>
-    /// <returns>DateTimeOffset.</returns>
+    /// <returns>A <see cref="DateTimeOffset"/> if the <c>dateValue</c> parameter was converted successfully; otherwise, <c>null</c>.</returns>
     public static DateTimeOffset? ParseDate(string dateValue)
     {
         /*

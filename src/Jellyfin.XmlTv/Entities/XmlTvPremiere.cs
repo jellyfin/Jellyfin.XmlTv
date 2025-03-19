@@ -15,7 +15,7 @@ public class XmlTvPremiere
     }
 
     /// <summary>
-    /// Gets the details denoting the first showing on natonal TV.
+    /// Gets the details denoting the first showing on national TV.
     /// </summary>
     public string Details { get; }
 }
