@@ -968,7 +968,7 @@ public partial class XmlTvReader
             return;
         }
 
-        if (output.Icons == null)
+        if (output.Icons is null)
         {
             output.Icons = [result];
 
@@ -1023,7 +1023,7 @@ public partial class XmlTvReader
             return;
         }
 
-        if (output.Images == null)
+        if (output.Images is null)
         {
             output.Images = [result];
 
@@ -1057,7 +1057,7 @@ public partial class XmlTvReader
             return;
         }
 
-        if (output.Urls == null)
+        if (output.Urls is null)
         {
             output.Urls = [result];
 
