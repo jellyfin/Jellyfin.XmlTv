@@ -24,4 +24,8 @@
     <ProjectReference Include="../../src/Jellyfin.XmlTv/Jellyfin.XmlTv.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AdditionalFiles Include="../../BannedSymbols.txt" />
+    <AdditionalFiles Include="../../stylecop.json" />
+  </ItemGroup>
 </Project>
