@@ -132,7 +132,7 @@ public partial class XmlTvReader
 
     private void SetChannelNumber(XmlTvChannel channel, string value)
     {
-        value = value.Replace('-', '.');
+        value = value.Replace('-', '.').Replace('_', '.');
         if (double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var _))
         {
             channel.Number = value;
