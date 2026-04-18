@@ -13,6 +13,7 @@
     <PackageId>Jellyfin.XmlTv</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/jellyfin/Jellyfin.XmlTv</RepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <!-- Code analyzers -->
@@ -29,5 +30,6 @@
   <ItemGroup>
     <AdditionalFiles Include="../../BannedSymbols.txt" />
     <AdditionalFiles Include="../../stylecop.json" />
+    <None Include="../../README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 </Project>
