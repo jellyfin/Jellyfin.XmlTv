@@ -216,7 +216,7 @@ public partial class XmlTvReader
             {
                 if (xmlProg.NodeType == XmlNodeType.Element)
                 {
-                    switch (xmlProg.Name)
+                    switch (xmlProg.Name.ToLower(CultureInfo.CurrentCulture))
                     {
                         case "title":
                             ProcessTitleNode(xmlProg, result);
