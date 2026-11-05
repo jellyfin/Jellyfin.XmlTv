@@ -102,13 +102,9 @@ public partial class XmlTvReader
                             break;
                         case "url":
                             ProcessUrlNode(xmlChannel, result);
-                            xmlChannel.Skip();
-
                             break;
                         case "icon":
                             ProcessIconNode(xmlChannel, result);
-                            xmlChannel.Skip();
-
                             break;
                         default:
                             xmlChannel.Skip(); // unknown, skip entire node
@@ -280,18 +276,12 @@ public partial class XmlTvReader
                             break;
                         case "icon":
                             ProcessIconNode(xmlProg, result);
-                            xmlProg.Skip();
-
                             break;
                         case "url":
                             ProcessUrlNode(xmlProg, result);
-                            xmlProg.Skip();
-
                             break;
                         case "image":
                             ProcessImageNode(xmlProg, result);
-                            xmlProg.Skip();
-
                             break;
                         case "premiere":
                             ProcessPremiereNode(xmlProg, result);
@@ -429,8 +419,10 @@ public partial class XmlTvReader
                                 // URL
                                 ProcessUrlNode(creditXml, credit);
                             }
-
-                            creditXml.Skip();
+                            else
+                            {
+                                creditXml.Skip();
+                            }
                         }
                         else
                         {
@@ -490,7 +482,7 @@ public partial class XmlTvReader
                 if (string.Equals(nodeName, "value", StringComparison.OrdinalIgnoreCase))
                 {
                     // Value
-                    var textValue = reader.ReadElementContentAsString();
+                    var textValue = starRatingXml.ReadElementContentAsString();
                     int index = textValue.IndexOf('/', StringComparison.Ordinal);
                     if (index != -1)
                     {
@@ -501,7 +493,6 @@ public partial class XmlTvReader
                         }
                         else
                         {
-                            starRatingXml.Skip();
                             return;
                         }
                     }
@@ -511,8 +502,10 @@ public partial class XmlTvReader
                     // Icon
                     ProcessIconNode(starRatingXml, rating);
                 }
-
-                starRatingXml.Skip();
+                else
+                {
+                    starRatingXml.Skip();
+                }
             }
             else
             {
@@ -558,10 +551,9 @@ public partial class XmlTvReader
                 if (string.Equals(nodeName, "value", StringComparison.OrdinalIgnoreCase))
                 {
                     // Value
-                    var value = reader.ReadElementContentAsString();
+                    var value = starRatingXml.ReadElementContentAsString();
                     if (string.IsNullOrEmpty(value))
                     {
-                        starRatingXml.Skip();
                         return;
                     }
 
@@ -572,8 +564,10 @@ public partial class XmlTvReader
                     // Icon
                     ProcessIconNode(starRatingXml, rating);
                 }
-
-                starRatingXml.Skip();
+                else
+                {
+                    starRatingXml.Skip();
+                }
             }
             else
             {
@@ -962,6 +956,9 @@ public partial class XmlTvReader
             result.Height = height;
             isPopulated = true;
         }
+
+        // Skip the element to match with similar helper methods.
+        reader.Skip();
 
         if (!isPopulated)
         {
